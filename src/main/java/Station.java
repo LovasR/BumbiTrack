@@ -2,15 +2,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Station {
-    Place place;
-    boolean isBike;
-    int numberID;
-    String name;
-    int bikeCapacity;
-    int bikesAvailable;
-    ArrayList<Bike> bikes;
+    private Place place;
+    private boolean isBike;
+    private int numberID;
+    private String name;
+    private int bikeCapacity;
+    private int bikesAvailable;
+    private ArrayList<Bike> bikes;
 
     Station(JSONObject json){
         place = new Place(json.getFloat("lng"), json.getFloat("lat"));
@@ -26,5 +27,33 @@ public class Station {
         for(int i = 0; i < bikeArray.length(); i++){
             bikes.add(new Bike(bikeArray.getJSONObject(i)));
         }
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public boolean isBike() {
+        return isBike;
+    }
+
+    public int getNumberID() {
+        return numberID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getBikeCapacity() {
+        return bikeCapacity;
+    }
+
+    public int getBikesAvailable() {
+        return bikesAvailable;
+    }
+
+    public List<Bike> getBikes() {
+        return new ArrayList<>(bikes);
     }
 }
