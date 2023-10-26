@@ -1,3 +1,5 @@
+package hu.tibipi.bumbitrack.core;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;

@@ -1,3 +1,5 @@
+package hu.tibipi.bumbitrack.core;
+
 import org.json.JSONObject;
 
 public class Bike {

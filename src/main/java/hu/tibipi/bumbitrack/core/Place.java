@@ -1,3 +1,5 @@
+package hu.tibipi.bumbitrack.core;
+
 public class Place {
     private final float longitude;
     private final float latitude;
