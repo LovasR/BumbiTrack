@@ -1,11 +1,20 @@
 import org.json.JSONObject;
 
 public class Bike {
-    int number;
-    boolean isActive;
+    private final int number;
+    private final boolean isActive;
 
     Bike(JSONObject json){
         number = json.getInt("number");
         isActive = json.getBoolean("active");
+    }
+
+
+    public int getNumber() {
+        return number;
+    }
+
+    public boolean getIsActive() {
+        return isActive;
     }
 }

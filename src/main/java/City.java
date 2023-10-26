@@ -4,9 +4,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class City {
-    String name;
-    Place place;
-    ArrayList<Station> stations;
+    private final String name;
+    private final Place place;
+    private final ArrayList<Station> stations;
 
     City(JSONObject json, String countryName, String cityName) throws CityNotFoundException, CountryNotFoundException {
         JSONObject cityJSON = findCityInJSON(json, countryName, cityName);
@@ -41,6 +41,18 @@ public class City {
             }
         }
         throw new CityNotFoundException();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public ArrayList<Station> getStations() {
+        return stations;
     }
 }
 

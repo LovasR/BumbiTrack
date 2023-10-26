@@ -8,7 +8,9 @@ public class Main {
 
     static Logger log;
     public static void main(String[] args){
+        log = Logger.getLogger(Main.class.getName());
         log.log(Level.INFO, "Initialized");
+
         String url = "https://maps.nextbike.net/maps/nextbike-live.json?domains=bh";    //this is hardcoded bh, meaning Budapest, Hungary
         String jsonString = null;
         try {

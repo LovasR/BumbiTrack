@@ -1,6 +1,6 @@
 public class Place {
-    private float longitude;
-    private float latitude;
+    private final float longitude;
+    private final float latitude;
     Place(float lo, float la){
         longitude = lo;
         latitude = la;

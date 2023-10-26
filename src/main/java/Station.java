@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Station {
-    private Place place;
-    private boolean isBike;
-    private int numberID;
-    private String name;
-    private int bikeCapacity;
-    private int bikesAvailable;
-    private ArrayList<Bike> bikes;
+    private final Place place;
+    private final boolean isBike;
+    private final int numberID;
+    private final String name;
+    private final int bikeCapacity;
+    private final int bikesAvailable;
+    private final ArrayList<Bike> bikes;
 
     Station(JSONObject json){
         place = new Place(json.getFloat("lng"), json.getFloat("lat"));
