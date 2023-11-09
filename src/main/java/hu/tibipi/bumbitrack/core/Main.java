@@ -1,5 +1,6 @@
 package hu.tibipi.bumbitrack.core;
 
+import hu.tibipi.bumbitrack.ui.UIManager;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -24,13 +25,22 @@ public class Main {
 
         JSONObject rootJSON = new JSONObject(jsonString);
 
+        Snapshot currentSnap = null;
         try{
             City bp = new City(rootJSON, "MOL Bubi", "Budapest");
+            currentSnap = new Snapshot(bp);
         } catch (CountryNotFoundException e){
             log.log(Level.SEVERE, "Specified country not found in file");
         } catch (CityNotFoundException e){
             log.log(Level.SEVERE, "Specified city not found in file");
         }
 
+        if(currentSnap == null){
+            log.log(Level.SEVERE, "Current snapshot is null, exiting");
+            System.exit(1);
+        }
+
+        AppUI appUI = new UIManager();
+        appUI.start();
     }
 }
