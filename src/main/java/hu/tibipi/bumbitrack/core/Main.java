@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 public class Main {
 
     static Logger log;
+    static Snapshot currentSnap = null;
+    public static final QueryManager qm = new QueryManager();
     public static void main(String[] args){
         log = Logger.getLogger(Main.class.getName());
         log.log(Level.INFO, "Initialized");
@@ -25,7 +27,6 @@ public class Main {
 
         JSONObject rootJSON = new JSONObject(jsonString);
 
-        Snapshot currentSnap = null;
         try{
             City bp = new City(rootJSON, "MOL Bubi", "Budapest");
             currentSnap = new Snapshot(bp);
@@ -42,5 +43,7 @@ public class Main {
 
         AppUI appUI = new UIManager();
         appUI.start();
+        appUI.addTestQueryActionListener(t -> qm.testStationQuery());
     }
+
 }
