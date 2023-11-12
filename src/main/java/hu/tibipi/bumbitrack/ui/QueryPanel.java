@@ -6,8 +6,6 @@ import hu.tibipi.bumbitrack.core.QueryManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,14 +13,18 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 public class QueryPanel extends JPanel {
-    JButton testButton;
+    JButton runQueryBt;
 
     private final JPanel queryLinesP;
-    private final ArrayList<QueryLineItem> queryLines;
-    private String selectedOption;
-    private JLabel outputLb;
-    private JComboBox<String> optionsCb;
-    private JButton queryLineAddBt;
+    private final ArrayList<QueryLineItem> queryLinesStation;
+    private final ArrayList<QueryLineItem> queryLinesBike;
+    private final JComboBox<String> typeSelectCb;
+
+    private enum ChosenType{
+        STATION, BIKE
+    }
+
+    ChosenType currentlyChosenType = ChosenType.STATION;
 
     QueryPanel(){
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -30,34 +32,83 @@ public class QueryPanel extends JPanel {
 
         EmptyBorder internalBorder = new EmptyBorder(10, 10, 10, 10);
 
+        JPanel typeSelectP = new JPanel();
+        typeSelectP.setLayout(new BoxLayout(typeSelectP, BoxLayout.X_AXIS));
+        JLabel typeSelectLb = new JLabel("Select a type to query: ");
+        typeSelectP.add(typeSelectLb);
+        typeSelectCb = new JComboBox<>(new String[] {"Station", "Bike"});
+        typeSelectCb.addActionListener(t -> {
+            String selected = (String) typeSelectCb.getSelectedItem();
+            assert selected != null;
+
+            if(selected.equals("Station")){
+                currentlyChosenType = ChosenType.STATION;
+            } else if(selected.equals("Bike")){
+                currentlyChosenType = ChosenType.BIKE;
+            }
+        });
+        typeSelectCb.setBorder(internalBorder);
+        typeSelectCb.setMaximumSize(new Dimension(300, 75));
+        typeSelectCb.setAlignmentX(Component.LEFT_ALIGNMENT);
+        typeSelectP.add(typeSelectCb);
+        typeSelectP.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.add(typeSelectP);
+        this.add(Box.createVerticalStrut(24));
+
         queryLinesP = new JPanel();
         queryLinesP.setLayout(new BoxLayout(queryLinesP, BoxLayout.Y_AXIS));
         queryLinesP.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(queryLinesP);
         this.add(Box.createVerticalStrut(24));
 
-        queryLines = new ArrayList<>();
+        queryLinesStation = new ArrayList<>();
+        queryLinesBike = new ArrayList<>();
 
-        queryLineAddBt = new JButton("Add");
+        JButton queryLineAddBt = createAddBt(internalBorder);
+        this.add(queryLineAddBt);
+        this.add(Box.createVerticalStrut(16));
+
+        runQueryBt = new JButton("Run query");
+        runQueryBt.setBorder(internalBorder);
+        runQueryBt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.add(runQueryBt);
+    }
+
+    ArrayList<QueryLineItem> getChosenQueryLines(){
+        if(currentlyChosenType == ChosenType.STATION){
+            return queryLinesStation;
+        } else if (currentlyChosenType == ChosenType.BIKE) {
+            return queryLinesBike;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private JButton createAddBt(EmptyBorder internalBorder) {
+        JButton queryLineAddBt = new JButton("Add");
         queryLineAddBt.addActionListener(t -> {
-            QueryLineItem queryLineItem = new QueryLineItem();
+            QueryLineItem queryLineItem = new QueryLineItem(this);
             queryLineItem.setBorder(new LineBorder(Color.DARK_GRAY, 2));
             queryLinesP.add(queryLineItem);
-            queryLines.add(queryLineItem);
+            getChosenQueryLines().add(queryLineItem);
             queryLinesP.revalidate();
             queryLinesP.repaint();
         });
         queryLineAddBt.setBorder(internalBorder);
-        this.add(queryLineAddBt);
-        this.add(Box.createVerticalStrut(16));
+        queryLineAddBt.setSize(new Dimension(800, 60));
+        queryLineAddBt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return queryLineAddBt;
+    }
 
-        testButton = new JButton("Test query");
-        testButton.setBorder(internalBorder);
-        this.add(testButton);
+    public void removeQueryLine(QueryLineItem queryLineItem){
+        getChosenQueryLines().remove(queryLineItem);
+        queryLinesP.remove(queryLineItem);
+        this.revalidate();
+        this.repaint();
     }
 
     void setTestButtonActionListener(Function<QueryManager, Object> actionListener){
-        testButton.addActionListener(new ClickActionListener<>(actionListener, Main.qm));
+        runQueryBt.addActionListener(new ClickActionListener<>(actionListener, Main.qm));
     }
 
     static class ClickActionListener<T> implements ActionListener {
