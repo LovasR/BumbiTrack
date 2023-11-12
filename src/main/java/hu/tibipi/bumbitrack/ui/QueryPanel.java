@@ -32,6 +32,10 @@ public class QueryPanel extends JPanel {
 
         EmptyBorder internalBorder = new EmptyBorder(10, 10, 10, 10);
 
+        queryLinesP = new JPanel();
+        queryLinesStation = new ArrayList<>();
+        queryLinesBike = new ArrayList<>();
+
         JPanel typeSelectP = new JPanel();
         typeSelectP.setLayout(new BoxLayout(typeSelectP, BoxLayout.X_AXIS));
         JLabel typeSelectLb = new JLabel("Select a type to query: ");
@@ -46,6 +50,13 @@ public class QueryPanel extends JPanel {
             } else if(selected.equals("Bike")){
                 currentlyChosenType = ChosenType.BIKE;
             }
+
+            queryLinesP.removeAll();
+            for(QueryLineItem queryLineItem : getChosenQueryLines()) {
+                queryLinesP.add(queryLineItem);
+            }
+            queryLinesP.revalidate();
+            queryLinesP.repaint();
         });
         typeSelectCb.setBorder(internalBorder);
         typeSelectCb.setMaximumSize(new Dimension(300, 75));
@@ -55,14 +66,10 @@ public class QueryPanel extends JPanel {
         this.add(typeSelectP);
         this.add(Box.createVerticalStrut(24));
 
-        queryLinesP = new JPanel();
         queryLinesP.setLayout(new BoxLayout(queryLinesP, BoxLayout.Y_AXIS));
         queryLinesP.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(queryLinesP);
         this.add(Box.createVerticalStrut(24));
-
-        queryLinesStation = new ArrayList<>();
-        queryLinesBike = new ArrayList<>();
 
         JButton queryLineAddBt = createAddBt(internalBorder);
         this.add(queryLineAddBt);
