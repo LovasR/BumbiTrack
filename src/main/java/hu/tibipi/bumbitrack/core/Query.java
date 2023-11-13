@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Query<T> {
-    private final ArrayList<Filter<T>> filters;
+    private ArrayList<Filter<T>> filters;
 
     Query(){
         filters = new ArrayList<>();
@@ -12,6 +12,9 @@ public class Query<T> {
 
     void addFilter(Filter<T> filter){
         filters.add(filter);
+    }
+    void setFilters(List<Filter<T>> filters){
+        this.filters = new ArrayList<>(filters);
     }
 
     ArrayList<Station> executeForStations(List<Station> stationsInput){

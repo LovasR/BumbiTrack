@@ -10,7 +10,7 @@ public class GeneralFilter<T, C> extends Filter<T> {
     BiPredicate<C, C> compareFunction;
     Function<T, C> getterFunction;
 
-    GeneralFilter(Function<T, C> getterFunction, C comparedValue, BiPredicate<C, C> compareFunction){
+    public GeneralFilter(Function<T, C> getterFunction, C comparedValue, BiPredicate<C, C> compareFunction){
         this.comparedValue = comparedValue;
         this.getterFunction = getterFunction;
         this.compareFunction = (compareFunction != null) ? compareFunction : Object::equals;

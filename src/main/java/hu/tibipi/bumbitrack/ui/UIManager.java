@@ -1,8 +1,11 @@
 package hu.tibipi.bumbitrack.ui;
 
 import hu.tibipi.bumbitrack.core.AppUI;
+import hu.tibipi.bumbitrack.core.Filter;
 import hu.tibipi.bumbitrack.core.QueryManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class UIManager implements AppUI {
@@ -20,5 +23,14 @@ public class UIManager implements AppUI {
     @Override
     public void addTestQueryActionListener(Function<QueryManager, Object> queryAction) {
         mainWindow.getQueryPanel().setTestButtonActionListener(queryAction);
+    }
+
+    @Override
+    public <T> List<Filter<T>> createFiltersFromQueryLines(){
+        ArrayList<Filter<T>> filters = new ArrayList<>();
+        for(QueryLineItem<T> queryLineItem : mainWindow.getQueryPanel().getChosenQueryLines()){
+            filters.add(queryLineItem.toFilter());
+        }
+        return filters;
     }
 }

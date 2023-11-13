@@ -58,4 +58,8 @@ public class Station {
     public List<Bike> getBikes() {
         return new ArrayList<>(bikes);
     }
+
+    public int getBikesNumber() {
+        return bikes.size();
+    }
 }

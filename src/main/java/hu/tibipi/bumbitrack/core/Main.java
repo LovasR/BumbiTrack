@@ -11,6 +11,7 @@ public class Main {
     static Snapshot currentSnap = null;
     public static final QueryManager qm = new QueryManager();
     public static void main(String[] args){
+        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         log.log(Level.INFO, "Initialized");
 
         Thread initialSnapshotGet = new Thread(Snapshot::createNewSnapshot);
@@ -18,7 +19,7 @@ public class Main {
 
         AppUI appUI = new UIManager();
         appUI.start();
-        appUI.addTestQueryActionListener(t -> qm.testStationQuery());
+        appUI.addTestQueryActionListener(t -> qm.testStationUIGeneratedQuery(appUI));
     }
 
 }

@@ -1,7 +1,9 @@
 package hu.tibipi.bumbitrack.ui;
 
+import hu.tibipi.bumbitrack.core.Bike;
 import hu.tibipi.bumbitrack.core.Main;
 import hu.tibipi.bumbitrack.core.QueryManager;
+import hu.tibipi.bumbitrack.core.Station;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class QueryPanel extends JPanel {
@@ -81,7 +84,7 @@ public class QueryPanel extends JPanel {
         this.add(runQueryBt);
     }
 
-    ArrayList<QueryLineItem> getChosenQueryLines(){
+    public List<QueryLineItem> getChosenQueryLines(){
         if(currentlyChosenType == ChosenType.STATION){
             return queryLinesStation;
         } else if (currentlyChosenType == ChosenType.BIKE) {
@@ -91,10 +94,20 @@ public class QueryPanel extends JPanel {
         }
     }
 
+    private Class getChosenType(){
+        if(currentlyChosenType == ChosenType.STATION){
+            return Station.class;
+        } else if (currentlyChosenType == ChosenType.BIKE) {
+            return Bike.class;
+        } else {
+            return Object.class;
+        }
+    }
+
     private JButton createAddBt(EmptyBorder internalBorder) {
         JButton queryLineAddBt = new JButton("Add");
         queryLineAddBt.addActionListener(t -> {
-            QueryLineItem queryLineItem = new QueryLineItem(this);
+            QueryLineItem<?> queryLineItem = new QueryLineItem<>(this, getChosenType());
             queryLineItem.setBorder(new LineBorder(Color.DARK_GRAY, 2));
             queryLinesP.add(queryLineItem);
             getChosenQueryLines().add(queryLineItem);
