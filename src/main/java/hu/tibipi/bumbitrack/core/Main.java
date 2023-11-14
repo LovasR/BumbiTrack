@@ -19,7 +19,7 @@ public class Main {
 
         AppUI appUI = new UIManager();
         appUI.start();
-        appUI.addTestQueryActionListener(t -> qm.testStationUIGeneratedQuery(appUI));
+        appUI.setQueryRunners(t -> qm.testStationUIGeneratedQuery(appUI), t -> qm.testBikeUIGeneratedQuery(appUI));
     }
 
 }

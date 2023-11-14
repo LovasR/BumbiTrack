@@ -128,7 +128,18 @@ public class QueryPanel extends JPanel {
     }
 
     void setTestButtonActionListener(Function<QueryManager, Object> actionListener){
-        runQueryBt.addActionListener(new ClickActionListener<>(actionListener, Main.qm));
+        //runQueryBt.addActionListener(new ClickActionListener<>(actionListener, Main.qm));
+
+    }
+
+    void setQueryRunner(Function<QueryManager, Object> stationQuery, Function<QueryManager, Object> bikeQuery){
+        runQueryBt.addActionListener(t -> {
+            if(currentlyChosenType == ChosenType.STATION){
+                stationQuery.apply(Main.qm);
+            } else if(currentlyChosenType == ChosenType.BIKE){
+                bikeQuery.apply(Main.qm);
+            }
+        });
     }
 
     static class ClickActionListener<T> implements ActionListener {

@@ -13,7 +13,7 @@ public class Station {
     private final String name;
     private final int bikeCapacity;
     private final int bikesAvailable;
-    private final ArrayList<Bike> bikes;
+    private ArrayList<Bike> bikes;
 
     Station(JSONObject json){
         place = new Place(json.getFloat("lng"), json.getFloat("lat"));
@@ -61,5 +61,9 @@ public class Station {
 
     public int getBikesNumber() {
         return bikes.size();
+    }
+
+    public void setBikes(List<Bike> nBikes){
+        bikes = new ArrayList<>(nBikes);
     }
 }

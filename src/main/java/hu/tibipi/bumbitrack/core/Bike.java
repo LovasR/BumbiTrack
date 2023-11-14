@@ -16,6 +16,10 @@ public class Bike {
         return number;
     }
 
+    public String getName() {
+        return String.valueOf(number);
+    }
+
     public boolean getIsActive() {
         return isActive;
     }

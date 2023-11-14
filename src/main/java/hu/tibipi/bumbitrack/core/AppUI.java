@@ -6,7 +6,7 @@ import java.util.function.Function;
 public interface AppUI {
     void start();
 
-    void addTestQueryActionListener(Function<QueryManager, Object> queryAction);
+    void setQueryRunners(Function<QueryManager, Object> stationQuery, Function<QueryManager, Object> bikeQuery);
 
     <T> List<Filter<T>> createFiltersFromQueryLines();
 }

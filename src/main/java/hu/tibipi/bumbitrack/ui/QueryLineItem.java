@@ -16,12 +16,21 @@ public class QueryLineItem<T> extends JPanel {
     private final JComboBox<String> comparatorCb;
     private final JTextField valueTf;
 
+    private final String[] stationOptions =
+            {"available", "contains", "capacity", "distance", "is bike", "currbikes"};
+    private final String[] bikeOptions =
+            {"contains"};
+
     public QueryLineItem(QueryPanel queryPanel, Class<T> queriedType) {
         this.queriedType = queriedType;
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setMaximumSize(new Dimension(800, 55));
 
-        valueCb = new JComboBox<>(new String[]{"available", "contains", "capacity", "distance", "is bike", "currbikes"});
+        if(queriedType == Station.class) {
+            valueCb = new JComboBox<>(stationOptions);
+        } else {
+            valueCb = new JComboBox<>(bikeOptions);
+        }
 
         comparatorCb = new JComboBox<>(new String[]{"==", "<=", ">=", "not"});
 
@@ -66,10 +75,9 @@ public class QueryLineItem<T> extends JPanel {
                             stringToPredicate(comparatorLabel)
                     );
                 case "contains":
-                    return new GeneralFilter<>(
+                    return new NameFilter<>(
                             createGetterFunction(classType, "getName"),
-                            comparedValue,
-                            stringToPredicate(comparatorLabel)
+                            comparedValue
                     );
                 case "capacity":
                     return new GeneralFilter<>(
@@ -90,6 +98,16 @@ public class QueryLineItem<T> extends JPanel {
                             createGetterFunction(classType, "getBikesNumber"),
                             permissiveIntParse(comparedValue),
                             stringToPredicate(comparatorLabel)
+                    );
+                default:
+                    throw new IllegalArgumentException("Getter selection error");
+            }
+        } else if(classType == Bike.class){
+            switch (label){
+                case "contains":
+                    return new NameFilter<>(
+                        createGetterFunction(classType, "getName"),
+                        comparedValue
                     );
                 default:
                     throw new IllegalArgumentException("Getter selection error");

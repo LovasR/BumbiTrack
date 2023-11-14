@@ -21,8 +21,8 @@ public class UIManager implements AppUI {
     }
 
     @Override
-    public void addTestQueryActionListener(Function<QueryManager, Object> queryAction) {
-        mainWindow.getQueryPanel().setTestButtonActionListener(queryAction);
+    public void setQueryRunners(Function<QueryManager, Object> stationQuery, Function<QueryManager, Object> bikeQuery) {
+        mainWindow.getQueryPanel().setQueryRunner(stationQuery, bikeQuery);
     }
 
     @Override

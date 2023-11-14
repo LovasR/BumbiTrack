@@ -9,7 +9,7 @@ public class NameFilter<T> extends Filter<T> {
 
     String token;
 
-    NameFilter(Function<T, String> getterFunction, String token){
+    public NameFilter(Function<T, String> getterFunction, String token){
         this.getterFunction = getterFunction;
         this.token = token;
     }
