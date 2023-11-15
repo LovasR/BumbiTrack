@@ -11,8 +11,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -150,19 +148,6 @@ public class QueryPanel extends JPanel {
                 bikeQuery.apply(Main.qm);
             }
         });
-    }
-
-    static class ClickActionListener<T> implements ActionListener {
-        Function<T, Object> function;
-        T t;
-        ClickActionListener(Function<T, Object> function, T instance){
-            this.function = function;
-            t = instance;
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            function.apply(t);
-        }
     }
 
     void setResultsToTreeView(List<Station> results){
