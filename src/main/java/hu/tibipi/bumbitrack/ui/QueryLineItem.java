@@ -4,11 +4,8 @@ import hu.tibipi.bumbitrack.core.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 public class QueryLineItem<T> extends JPanel {
     private final Class<T> queriedType;
@@ -64,38 +61,55 @@ public class QueryLineItem<T> extends JPanel {
         }
     }
 
+    private boolean booleanParse(String string){
+        string = string.toLowerCase();
+        switch (string){
+            case "true",  "1":
+                return true;
+
+            case "false", "0":
+            default:
+                return false;
+        }
+    }
+
     private Filter<T> toFilterInternal(Class<T> classType, String label, String comparedValue, String comparatorLabel){
 
         if(classType == Station.class) {
             switch (label) {
                 case "available":
-                    return new GeneralFilter<>(
-                            createGetterFunction(classType, "getBikesAvailable"),
+                    Function<Station, Integer> getterFunction1 = Main.getStationGetterFunction("getBikesAvailable");
+                    return (Filter<T>) new GeneralFilter<>(
+                            getterFunction1,
                             permissiveIntParse(comparedValue),
                             stringToPredicate(comparatorLabel)
                     );
                 case "contains":
-                    return new NameFilter<>(
-                            createGetterFunction(classType, "getName"),
+                    Function<Station, String> getterFunction2 = Main.getStationGetterFunction("getName");
+                    return (Filter<T>) new NameFilter<>(
+                            getterFunction2,
                             comparedValue
                     );
                 case "capacity":
-                    return new GeneralFilter<>(
-                            createGetterFunction(classType, "getBikeCapacity"),
+                    Function<Station, Integer> getterFunction3 = Main.getStationGetterFunction("getBikeCapacity");
+                    return (Filter<T>) new GeneralFilter<>(
+                            getterFunction3,
                             permissiveIntParse(comparedValue),
                             stringToPredicate(comparatorLabel)
                     );
                 case "distance":
                     break;
                 case "is_bike":
-                    return new GeneralFilter<>(
-                            createGetterFunction(classType, "isBike"),
-                            permissiveIntParse(comparedValue),
+                    Function<Station, Boolean> getterFunction5 = Main.getStationGetterFunction("isBike");
+                    return (Filter<T>) new GeneralFilter<>(
+                            getterFunction5,
+                            booleanParse(comparedValue),
                             stringToPredicate(comparatorLabel)
                     );
                 case "currbikes":
-                    return new GeneralFilter<>(
-                            createGetterFunction(classType, "getBikesNumber"),
+                    Function<Station, Integer> getterFunction6 =  Main.getStationGetterFunction("getBikesNumber");
+                    return (Filter<T>) new GeneralFilter<>(
+                            getterFunction6,
                             permissiveIntParse(comparedValue),
                             stringToPredicate(comparatorLabel)
                     );
@@ -105,8 +119,9 @@ public class QueryLineItem<T> extends JPanel {
         } else if(classType == Bike.class){
             switch (label){
                 case "contains":
-                    return new NameFilter<>(
-                        createGetterFunction(classType, "getName"),
+                    Function<Bike, String> getterFunction1 = Main.getBikeGetterFunction("getName");
+                    return (Filter<T>) new NameFilter<>(
+                        getterFunction1,
                         comparedValue
                     );
                 default:
@@ -131,21 +146,6 @@ public class QueryLineItem<T> extends JPanel {
         }
     }
 
-    private static LogRecord generateLambdaErrorRecord(Exception e){
-        return new LogRecord(Level.SEVERE, e.toString() + "\n\nEXITING");
-    }
 
-    private static <T, R> Function<T, R> createGetterFunction(Class<T> classType, String propertyName) {
-        return (T input) -> {
-            try {
-                Method method = classType.getMethod(propertyName);
-                Object result = method.invoke(input);
-                return (R) result;
-            } catch (Exception e) {
-                Main.log.log(generateLambdaErrorRecord(e));
-                System.exit(1);
-                return null;
-            }
-        };
-    }
+
 }
