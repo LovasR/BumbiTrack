@@ -29,7 +29,10 @@ public class Main {
         AppUI appUI = new UIManager();
         appUI.start();
         appUI.setQueryRunners(t -> qm.testStationUIGeneratedQuery(appUI), t -> qm.testBikeUIGeneratedQuery(appUI));
+        appUI.setRouteQueryRunner(t -> qm.routeQuery(appUI));
     }
+
+
 
     private static void initGetterFunctionMaps(){
         stationGetterFunctionMap = new HashMap<>();

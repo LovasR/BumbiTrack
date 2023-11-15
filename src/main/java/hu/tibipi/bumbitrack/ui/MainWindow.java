@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainWindow extends JFrame {
-    private JTabbedPane mainPane;
+    private final JTabbedPane mainPane;
 
-    private QueryPanel queryPanel;
-    private JPanel routePanel;
+    private final QueryPanel queryPanel;
+    private final RoutePanel routePanel;
     private JPanel statisticsPanel;
     private JPanel settingsPanel;
 
@@ -17,7 +17,7 @@ public class MainWindow extends JFrame {
         this.setPreferredSize(new Dimension(800, 600));
 
         queryPanel = new QueryPanel();
-        routePanel = new JPanel();
+        routePanel = new RoutePanel();
         statisticsPanel = new JPanel();
         settingsPanel = new JPanel();
 
@@ -36,5 +36,9 @@ public class MainWindow extends JFrame {
 
     JTabbedPane getMainPane(){
         return mainPane;
+    }
+
+    RoutePanel getRoutePanel(){
+        return routePanel;
     }
 }

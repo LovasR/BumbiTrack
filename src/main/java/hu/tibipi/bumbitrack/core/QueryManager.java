@@ -1,6 +1,8 @@
 package hu.tibipi.bumbitrack.core;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 
 public class QueryManager {
 
@@ -11,7 +13,7 @@ public class QueryManager {
 
         List<Station> stations = query.executeForStations(Main.currentSnap.getCity().getStations());
 
-        appUI.setResultsToCurrent(stations);
+        appUI.setResultsToCurrent(stations, null);
 
         return null;
     }
@@ -23,8 +25,45 @@ public class QueryManager {
 
         List<Station> stations = query.executeForBikes(Main.currentSnap.getCity().getStations());
 
-        appUI.setResultsToCurrent(stations);
+        appUI.setResultsToCurrent(stations, null);
 
         return null;
+    }
+
+    Void routeQuery(AppUI appUI){
+        Query<Bike> query = new Query<>();
+        String bikeName = appUI.getBikeNameToFollow();
+
+        Function<Bike, String> getterFunction = Main.getBikeGetterFunction("getName");
+
+        List<Filter<Bike>> filters = new ArrayList<>();
+        filters.add(new NameFilter<>(getterFunction, bikeName));
+
+        query.setFilters(filters);
+
+        List<Station> route = new ArrayList<>();
+        List<LocalDateTime> times = new ArrayList<>();
+
+        for(Snapshot snap : Snapshot.getSnapshots()){
+            List<Station> result = query.executeForBikes(snap.getCity().getStations());
+            if(result.size() > 1){
+                throw new TooManyQueryResultsException();
+            }
+            if(result.isEmpty()){
+                //create a virtual station that is actually just a placeholder
+                route.add(new Station("In transit or out of system"));
+            } else {
+                route.add(result.get(0));
+            }
+            times.add(snap.getDateTime());
+        }
+
+        appUI.setResultsToCurrent(route, times);
+
+        return null;
+    }
+
+    static class TooManyQueryResultsException extends RuntimeException{
+
     }
 }

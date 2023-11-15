@@ -31,6 +31,18 @@ public class Station {
         }
     }
 
+    //creates a virtual station that shouldn't be used
+    Station(String name){
+        this.name = name;
+
+        place = null;
+        isBike = false;
+        numberID = -1;
+        bikeCapacity = -1;
+        bikesAvailable = -1;
+        bikes = null;
+    }
+
     public Place getPlace() {
         return place;
     }
