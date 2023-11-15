@@ -9,4 +9,6 @@ public interface AppUI {
     void setQueryRunners(Function<QueryManager, Object> stationQuery, Function<QueryManager, Object> bikeQuery);
 
     <T> List<Filter<T>> createFiltersFromQueryLines();
+
+    void setResultsToCurrent(List<Station> results);
 }

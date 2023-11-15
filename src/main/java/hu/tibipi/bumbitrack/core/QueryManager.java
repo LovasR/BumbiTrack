@@ -1,7 +1,6 @@
 package hu.tibipi.bumbitrack.core;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class QueryManager {
 
@@ -11,9 +10,8 @@ public class QueryManager {
         query.setFilters(filters);
 
         List<Station> stations = query.executeForStations(Main.currentSnap.getCity().getStations());
-        for(Station station : stations){
-            Main.log.log(Level.INFO, station.getName());
-        }
+
+        appUI.setResultsToCurrent(stations);
 
         return null;
     }
@@ -24,9 +22,9 @@ public class QueryManager {
         query.setFilters(filters);
 
         List<Station> stations = query.executeForBikes(Main.currentSnap.getCity().getStations());
-        for(Station station : stations){
-            Main.log.log(Level.INFO, station.getName());
-        }
+
+        appUI.setResultsToCurrent(stations);
+
         return null;
     }
 }

@@ -8,6 +8,8 @@ import hu.tibipi.bumbitrack.core.Station;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +24,8 @@ public class QueryPanel extends JPanel {
     private final ArrayList<QueryLineItem> queryLinesStation;
     private final ArrayList<QueryLineItem> queryLinesBike;
     private final JComboBox<String> typeSelectCb;
+
+    private final DefaultTreeModel resultTrModel;
 
     private enum ChosenType{
         STATION, BIKE
@@ -78,6 +82,17 @@ public class QueryPanel extends JPanel {
         this.add(queryLineAddBt);
         this.add(Box.createVerticalStrut(16));
 
+        JTree resultTr = new JTree();
+        resultTr.setAlignmentX(Component.LEFT_ALIGNMENT);
+        resultTrModel = new DefaultTreeModel(new DefaultMutableTreeNode("."));
+        resultTr.setModel(resultTrModel);
+        resultTr.setRootVisible(false);
+        JScrollPane resultTrScrollPane = new JScrollPane(resultTr);
+        resultTrScrollPane.setLayout(new ScrollPaneLayout());
+        resultTrScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.add(resultTrScrollPane);
+        this.add(Box.createVerticalStrut(16));
+
         runQueryBt = new JButton("Run query");
         runQueryBt.setBorder(internalBorder);
         runQueryBt.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -127,11 +142,6 @@ public class QueryPanel extends JPanel {
         this.repaint();
     }
 
-    void setTestButtonActionListener(Function<QueryManager, Object> actionListener){
-        //runQueryBt.addActionListener(new ClickActionListener<>(actionListener, Main.qm));
-
-    }
-
     void setQueryRunner(Function<QueryManager, Object> stationQuery, Function<QueryManager, Object> bikeQuery){
         runQueryBt.addActionListener(t -> {
             if(currentlyChosenType == ChosenType.STATION){
@@ -155,6 +165,26 @@ public class QueryPanel extends JPanel {
         }
     }
 
+    void setResultsToTreeView(List<Station> results){
+        Main.log.info("Updating results...");
+        DefaultMutableTreeNode root = ((DefaultMutableTreeNode) resultTrModel.getRoot());
+        root.removeAllChildren();
 
+        if(getChosenType() == Station.class){
+            for(Station station : results){
+                root.add(new DefaultMutableTreeNode(station.getName()));
+            }
+        } else {
+            for(Station station : results){
+                DefaultMutableTreeNode stationNode = new DefaultMutableTreeNode(station.getName());
+                for(Bike bike : station.getBikes()){
+                    stationNode.add(new DefaultMutableTreeNode(bike.getName()));
+                }
+                root.add(stationNode);
+            }
+        }
+
+        resultTrModel.reload();
+    }
 
 }
