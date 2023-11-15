@@ -1,8 +1,6 @@
 package hu.tibipi.bumbitrack.ui;
 
-import hu.tibipi.bumbitrack.core.AppUI;
-import hu.tibipi.bumbitrack.core.Filter;
-import hu.tibipi.bumbitrack.core.QueryManager;
+import hu.tibipi.bumbitrack.core.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,4 +31,17 @@ public class UIManager implements AppUI {
         }
         return filters;
     }
+
+    @Override
+    public void setResultsToCurrent(List<Station> results) {
+        switch(mainWindow.getMainPane().getSelectedIndex()){
+            case 0:
+                mainWindow.getQueryPanel().setResultsToTreeView(results);
+                break;
+            default:
+                return;
+        }
+    }
+
+
 }

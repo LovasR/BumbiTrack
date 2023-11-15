@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainWindow extends JFrame {
-    JTabbedPane mainPane;
+    private JTabbedPane mainPane;
 
     private QueryPanel queryPanel;
     private JPanel routePanel;
@@ -32,5 +32,9 @@ public class MainWindow extends JFrame {
 
     QueryPanel getQueryPanel(){
         return queryPanel;
+    }
+
+    JTabbedPane getMainPane(){
+        return mainPane;
     }
 }
