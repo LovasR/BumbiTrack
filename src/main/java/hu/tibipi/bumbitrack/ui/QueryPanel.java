@@ -152,19 +152,6 @@ public class QueryPanel extends JPanel {
         });
     }
 
-    static class ClickActionListener<T> implements ActionListener {
-        Function<T, Object> function;
-        T t;
-        ClickActionListener(Function<T, Object> function, T instance){
-            this.function = function;
-            t = instance;
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            function.apply(t);
-        }
-    }
-
     void setResultsToTreeView(List<Station> results){
         Main.log.info("Updating results...");
         DefaultMutableTreeNode root = ((DefaultMutableTreeNode) resultTrModel.getRoot());
