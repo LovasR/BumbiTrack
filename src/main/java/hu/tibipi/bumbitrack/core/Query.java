@@ -29,7 +29,10 @@ public class Query<T> {
     }
 
     ArrayList<Station> executeForBikes(List<Station> stationsInput){
-        Set<Station> stations = new HashSet<>(stationsInput);
+        Set<Station> stations = new HashSet<>();
+        for(Station station : stationsInput){
+            stations.add(station.clone());
+        }
 
         List<Bike> bikesIn;
         List<Bike> currentBikes;
