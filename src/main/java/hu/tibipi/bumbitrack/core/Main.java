@@ -21,7 +21,9 @@ public class Main {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         log.log(Level.INFO, "Initialized");
 
-        Thread initialSnapshotGet = new Thread(Snapshot::createNewSnapshot);
+        SnapshotManager.initSnapshotManager();
+
+        Thread initialSnapshotGet = new Thread(SnapshotManager::createNewSnapshot);
         initialSnapshotGet.start();
 
         initGetterFunctionMaps();
