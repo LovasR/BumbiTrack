@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Station implements Cloneable{
+public class Station {
     private final Place place;
     private final boolean isBike;
     private final int numberID;
@@ -43,15 +43,15 @@ public class Station implements Cloneable{
         bikes = null;
     }
 
-    @Override
-    public Station clone() {
-        try {
-            Station clone = (Station) super.clone();
-            clone.setBikes(new ArrayList<>(this.getBikes()));
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+    Station(Station stationToCopy){
+        this.name = stationToCopy.name;
+        this.place = stationToCopy.place;
+        this.bikesAvailable = stationToCopy.bikesAvailable;
+        this.numberID = stationToCopy.numberID;
+        this.isBike = stationToCopy.isBike;
+        this.bikeCapacity = stationToCopy.bikeCapacity;
+
+        this.bikes = new ArrayList<>(stationToCopy.bikes);
     }
 
     public Place getPlace() {

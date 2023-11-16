@@ -31,7 +31,7 @@ public class Query<T> {
     ArrayList<Station> executeForBikes(List<Station> stationsInput){
         Set<Station> stations = new HashSet<>();
         for(Station station : stationsInput){
-            stations.add(station.clone());
+            stations.add(new Station(station));
         }
 
         List<Bike> bikesIn;
