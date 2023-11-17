@@ -72,11 +72,14 @@ public class RoutePanel extends JPanel {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(int i = 0; i < results.size(); i++){
+            String entryLabel = results.get(i).getName();
+            if(entryLabel.isEmpty())
+                entryLabel = "In transit or out of system";
             root.add(new DefaultMutableTreeNode(
             "["
                     + times.get(i).format(formatter)
                     + "]  "
-                    + results.get(i).getName()));
+                    + entryLabel));
         }
 
 

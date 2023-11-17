@@ -51,7 +51,7 @@ public class QueryManager {
             }
             if(result.isEmpty()){
                 //create a virtual station that is actually just a placeholder
-                route.add(new Station("In transit or out of system"));
+                route.add(new Station(""));
             } else {
                 route.add(result.get(0));
             }
