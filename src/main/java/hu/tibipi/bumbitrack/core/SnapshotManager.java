@@ -9,6 +9,7 @@ import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -167,6 +168,9 @@ public class SnapshotManager {
         }
 
         createNewSnapshotDirectory(currentSnapshotDirectoryName);
+
+        unzipSnapshotsToDirectory(currentSnapshotDirectoryName,
+                Paths.get("data", currentSnapshotDirectoryName + ".zip").toString());
     }
 
     private static void createNewSnapshotDirectory(String directoryName){
@@ -174,6 +178,36 @@ public class SnapshotManager {
 
         if(!snapshotDirectory.mkdir()){
             Main.log.severe("Couldn't create used snapshot directory");
+        }
+    }
+
+    private static void unzipSnapshotsToDirectory(String directoryName, String zipFilePath){
+        int numThreads = 4;
+        try (FileSystem fs = FileSystems.newFileSystem(Paths.get(directoryName, zipFilePath), (Map<String, ?>) null)) {
+
+            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+            try (Stream<Path> entries = Files.walk(fs.getPath("/"))) {
+                entries.filter(Files::isRegularFile)
+                        .forEach(path -> executor.execute(new FileExtractor(path, fs)));
+            }
+
+            executor.shutdown();
+        } catch (IOException e) {
+            Main.log.severe("Couldn't unzip (" + zipFilePath + "): " + e.getLocalizedMessage());
+        }
+    }
+
+    private record FileExtractor(Path zipEntryPath, FileSystem fileSystem) implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Path outputFilePath = Paths.get(zipEntryPath.toString().substring(1)); // Remove leading "/"
+                Files.copy(fileSystem.getPath(zipEntryPath.toString()), outputFilePath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                Main.log.severe("Couldn't unzip snapshot file (" + zipEntryPath + "): " + e.getLocalizedMessage());
+                throw new EnvironmentSetupException();
+            }
         }
     }
 
