@@ -14,6 +14,11 @@ public class Snapshot {
         this.city = city;
         this.ID = createID(countryName, city.getName());
     }
+    Snapshot(City city, String countryName, LocalDateTime dateTime){
+        this.dateTime = dateTime;
+        this.city = city;
+        this.ID = createID(countryName, city.getName());
+    }
 
     public static String createID(String countryName, String cityName){
         countryName = countryName.toLowerCase().replace(" ", "_");

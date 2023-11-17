@@ -71,18 +71,31 @@ public class RoutePanel extends JPanel {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        String lastEntryLabel = "";
         for(int i = 0; i < results.size(); i++){
             String entryLabel = results.get(i).getName();
-            if(entryLabel.isEmpty())
-                entryLabel = "In transit or out of system";
-            root.add(new DefaultMutableTreeNode(
-            "["
-                    + times.get(i).format(formatter)
-                    + "]  "
-                    + entryLabel));
+
+            if(i == results.size() - 1) {
+                createResultNode(root, entryLabel, times.get(i), formatter);
+                break;
+            }
+            if(!entryLabel.equals(lastEntryLabel) || !results.get(i + 1).getName().equals(entryLabel)){
+                createResultNode(root, entryLabel, times.get(i), formatter);
+            }
+
+            lastEntryLabel = entryLabel;
         }
 
 
         resultTrModel.reload();
+    }
+
+    private void createResultNode(DefaultMutableTreeNode root, String entryLabel, LocalDateTime time, DateTimeFormatter formatter){
+        if(entryLabel.isEmpty())
+            entryLabel = "In transit or out of system";
+
+        root.add(new DefaultMutableTreeNode(
+                "[" + time.format(formatter) + "]  "
+                        + entryLabel));
     }
 }
