@@ -2,16 +2,14 @@ package hu.tibipi.bumbitrack.ui;
 
 import hu.tibipi.bumbitrack.core.Main;
 import hu.tibipi.bumbitrack.core.QueryManager;
-import hu.tibipi.bumbitrack.core.Station;
+import hu.tibipi.bumbitrack.core.Route;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.function.Function;
 
 public class RoutePanel extends JPanel {
@@ -76,38 +74,73 @@ public class RoutePanel extends JPanel {
         return Integer.parseInt(resultLimitTf.getText());
     }
 
-    void setResultsToTreeView(List<Station> results, List<LocalDateTime> times){
+    void setResultsToTreeView(Route resultRoute){
         Main.log.info("Showing route...");
         DefaultMutableTreeNode root = ((DefaultMutableTreeNode) resultTrModel.getRoot());
         root.removeAllChildren();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        int lengthOfTimestamps = "[yyyy-MM-dd HH:mm:ss]    [yyyy-MM-dd HH:mm:ss]".length();
 
-        String lastEntryLabel = "";
-        for(int i = 0; i < results.size(); i++){
-            String entryLabel = results.get(i).getName();
+        int longestNameOnRoute = getLongestStationNameOnRoute(resultRoute);
+        for(Route.RouteItem routeItem : resultRoute.getStops()){
 
-            if(i == results.size() - 1) {
-                createResultNode(root, entryLabel, times.get(i), formatter);
-                break;
+            if(routeItem instanceof Route.RouteStop routeStop) {
+                root.add(new DefaultMutableTreeNode(createRouteStopLabel(routeStop, formatter, longestNameOnRoute)));
+            } else {
+                root.add(new DefaultMutableTreeNode(createRouteGapLabel((Route.RouteGap) routeItem, longestNameOnRoute, lengthOfTimestamps)));
             }
-            if(!entryLabel.equals(lastEntryLabel) || !results.get(i + 1).getName().equals(entryLabel)){
-                createResultNode(root, entryLabel, times.get(i), formatter);
-            }
-
-            lastEntryLabel = entryLabel;
         }
-
 
         resultTrModel.reload();
     }
 
-    private void createResultNode(DefaultMutableTreeNode root, String entryLabel, LocalDateTime time, DateTimeFormatter formatter){
-        if(entryLabel.isEmpty())
-            entryLabel = "In transit or out of system";
+    private int getLongestStationNameOnRoute(Route route) {
+        int currentMax = "In transit".length();
+        for (Route.RouteItem routeItem : route.getStops()) {
+            if(routeItem instanceof Route.RouteStop routeStop) {
+                int stationNameLength = routeStop.getStation().getName().length();
+                if (stationNameLength > currentMax)
+                    currentMax = stationNameLength;
+            }
+        }
+        return currentMax;
+    }
 
-        root.add(new DefaultMutableTreeNode(
-                "[" + time.format(formatter) + "]  "
-                        + entryLabel));
+    private String createRouteStopLabel(Route.RouteStop routeStop, DateTimeFormatter formatter, int longestNameLength){
+        String startTimestamp = "[" + formatter.format(routeStop.getStart()) + "]  ";
+        String name = routeStop.getStation().getName();
+        if(name.isEmpty()){
+            name = "In transit";
+        }
+        String fillerSpace = " ";
+        String endTimestamp = "  [" + formatter.format(routeStop.getEnd()) + "]";
+
+        return startTimestamp + name + fillerSpace.repeat(longestNameLength - name.length()) + endTimestamp;
+    }
+
+    private String intToTwoCharacter(long num){
+        return (num < 10 ? "0" + num : String.valueOf(num));
+    }
+
+    private String createRouteGapLabel(Route.RouteGap routeGap, int longestNameLength, int lengthOfTimestamps){
+        long days = routeGap.getDuration().toDays();
+        long hours = routeGap.getDuration().toHours();
+
+        String durationString = "";
+        if(days > 0)
+            durationString += intToTwoCharacter(days) + " day" + (days > 1 ? "s" : "");
+        if(hours > 0)
+            durationString += intToTwoCharacter(hours) + " hour" + (hours > 1 ? "s" : "");
+
+        String fillerSpace = "―";
+        String header = "Gap of ";
+        //filler num rounded so it shift left rather than left
+        int numOfFiller = Math.round((float)
+                (longestNameLength + lengthOfTimestamps - durationString.length() - header.length()) / 2);
+
+        String resultString = fillerSpace.repeat(numOfFiller) + header + durationString;
+        return resultString +
+                fillerSpace.repeat(lengthOfTimestamps + longestNameLength - resultString.length());
     }
 }

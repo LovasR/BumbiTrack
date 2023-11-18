@@ -2,7 +2,6 @@ package hu.tibipi.bumbitrack.ui;
 
 import hu.tibipi.bumbitrack.core.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -49,20 +48,12 @@ public class UIManager implements AppUI {
     }
 
     @Override
-    public void setResultsToCurrent(List<Station> results, List<LocalDateTime> times) {
-        switch(mainWindow.getMainPane().getSelectedIndex()){
-            case 0:
-                //QueryPanel
-                mainWindow.getQueryPanel().setResultsToTreeView(results);
-                break;
-            case 1:
-                //RoutePanel
-                mainWindow.getRoutePanel().setResultsToTreeView(results, times);
-                break;
-            default:
-                return;
-        }
+    public void setQueryResults(List<Station> results) {
+        mainWindow.getQueryPanel().setResultsToTreeView(results);
     }
 
-
+    @Override
+    public void setRouteResults(Route resultRoute){
+        mainWindow.getRoutePanel().setResultsToTreeView(resultRoute);
+    }
 }

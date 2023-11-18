@@ -1,6 +1,5 @@
 package hu.tibipi.bumbitrack.core;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 
@@ -17,5 +16,7 @@ public interface AppUI {
 
     int getRouteLimit();
 
-    void setResultsToCurrent(List<Station> results, List<LocalDateTime> times);
+    void setQueryResults(List<Station> results);
+
+    void setRouteResults(Route resultRoute);
 }

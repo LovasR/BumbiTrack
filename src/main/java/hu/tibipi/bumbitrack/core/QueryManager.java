@@ -13,7 +13,7 @@ public class QueryManager {
 
         List<Station> stations = query.executeForStations(Main.currentSnap.getCity().getStations());
 
-        appUI.setResultsToCurrent(stations, null);
+        appUI.setQueryResults(stations);
 
         return null;
     }
@@ -25,7 +25,7 @@ public class QueryManager {
 
         List<Station> stations = query.executeForBikes(Main.currentSnap.getCity().getStations());
 
-        appUI.setResultsToCurrent(stations, null);
+        appUI.setQueryResults(stations);
 
         return null;
     }
@@ -41,7 +41,7 @@ public class QueryManager {
 
         query.setFilters(filters);
 
-        List<Station> route = new ArrayList<>();
+        List<Station> resultStations = new ArrayList<>();
         List<LocalDateTime> times = new ArrayList<>();
 
         int firstIndex = SnapshotManager.getSnapshots().size() - appUI.getRouteLimit();
@@ -56,14 +56,16 @@ public class QueryManager {
             }
             if(result.isEmpty()){
                 //create a virtual station that is actually just a placeholder
-                route.add(new Station(""));
+                resultStations.add(new Station(""));
             } else {
-                route.add(result.get(0));
+                resultStations.add(result.get(0));
             }
             times.add(snap.getDateTime());
         }
 
-        appUI.setResultsToCurrent(route, times);
+        Route route = new Route(resultStations, times);
+
+        appUI.setRouteResults(route);
 
         return null;
     }
