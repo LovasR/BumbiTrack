@@ -44,7 +44,12 @@ public class QueryManager {
         List<Station> route = new ArrayList<>();
         List<LocalDateTime> times = new ArrayList<>();
 
-        for(Snapshot snap : SnapshotManager.getSnapshots()){
+        int firstIndex = SnapshotManager.getSnapshots().size() - appUI.getRouteLimit();
+        List<Snapshot> snapshots =
+                SnapshotManager.getSnapshots()
+                .subList(Math.max(firstIndex, 0), SnapshotManager.getSnapshots().size());
+
+        for(Snapshot snap : snapshots){
             List<Station> result = query.executeForBikes(snap.getCity().getStations());
             if(result.size() > 1){
                 throw new TooManyQueryResultsException();

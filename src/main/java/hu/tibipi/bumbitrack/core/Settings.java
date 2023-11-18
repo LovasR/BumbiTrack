@@ -42,6 +42,7 @@ public class Settings {
         settingsJSONObject.put(URL, "https://maps.nextbike.net/maps/nextbike-live.json?domains=bh");
         settingsJSONObject.put(COUNTRY_NAME, "MOL Bubi");
         settingsJSONObject.put(CITY_NAME, "Budapest");
+        settingsJSONObject.put(SNAPSHOT_LIMIT, 1000);
 
         try {
             Files.writeString(Paths.get("data", SETTINGS_FILENAME), settingsJSONObject.toString(2));
@@ -63,5 +64,6 @@ public class Settings {
     public static final String UPDATE_FREQUENCY = "updateFrequency";
     public static final String COUNTRY_NAME = "countryName";
     public static final String CITY_NAME = "cityName";
+    public static final String SNAPSHOT_LIMIT = "snapshotLimit";
 
 }

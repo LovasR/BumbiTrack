@@ -18,6 +18,8 @@ public class RoutePanel extends JPanel {
 
     private final JTextField bikeChooseTf;
 
+    private final JTextField resultLimitTf;
+
     private final JButton followBt;
 
     private final DefaultTreeModel resultTrModel;
@@ -29,14 +31,20 @@ public class RoutePanel extends JPanel {
         EmptyBorder internalBorder = new EmptyBorder(10, 10, 10, 10);
 
         JPanel bikeChooseP = new JPanel();
-        bikeChooseP.setMaximumSize(new Dimension(800, 55));
+        bikeChooseP.setMaximumSize(new Dimension(1000, 55));
         bikeChooseP.setLayout(new BoxLayout(bikeChooseP, BoxLayout.X_AXIS));
         JLabel bikeChooseLb = new JLabel("Choose bike to follow: ");
         bikeChooseLb.setBorder(internalBorder);
         bikeChooseTf = new JTextField(10);
         bikeChooseTf.setBorder(internalBorder);
+        JLabel resultLimitLb = new JLabel("Set limit: ");
+        resultLimitLb.setBorder(internalBorder);
+        resultLimitTf = new JTextField("100", 5);
+        resultLimitTf.setBorder(internalBorder);
         bikeChooseP.add(bikeChooseLb);
         bikeChooseP.add(bikeChooseTf);
+        bikeChooseP.add(resultLimitLb);
+        bikeChooseP.add(resultLimitTf);
         bikeChooseP.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(bikeChooseP);
         this.add(Box.createVerticalStrut(16));
@@ -62,6 +70,10 @@ public class RoutePanel extends JPanel {
 
     String getBikeNameToFollow(){
         return bikeChooseTf.getText();
+    }
+
+    int getResultLimit(){
+        return Integer.parseInt(resultLimitTf.getText());
     }
 
     void setResultsToTreeView(List<Station> results, List<LocalDateTime> times){

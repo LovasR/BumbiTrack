@@ -159,7 +159,7 @@ public class SnapshotManager {
                         try {
                             Files.delete(file);
                         } catch (IOException e) {
-                            Main.log.severe("Couldn't delete file (" + file.getFileName() + "): " + e);
+                            Main.log.severe("Couldn't delete file (" + file.getFileName() + "): " + e.getLocalizedMessage());
                         }
                     });
             Files.delete(oldDirectoryPath);

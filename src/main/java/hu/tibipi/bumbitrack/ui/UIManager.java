@@ -43,6 +43,10 @@ public class UIManager implements AppUI {
         mainWindow.getRoutePanel().setFollowBt(routeQuery);
     }
 
+    @Override
+    public int getRouteLimit(){
+        return mainWindow.getRoutePanel().getResultLimit();
+    }
 
     @Override
     public void setResultsToCurrent(List<Station> results, List<LocalDateTime> times) {

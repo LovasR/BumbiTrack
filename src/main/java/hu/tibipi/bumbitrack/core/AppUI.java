@@ -15,5 +15,7 @@ public interface AppUI {
 
     void setRouteQueryRunner(Function<QueryManager, Void> routeQuery);
 
+    int getRouteLimit();
+
     void setResultsToCurrent(List<Station> results, List<LocalDateTime> times);
 }
