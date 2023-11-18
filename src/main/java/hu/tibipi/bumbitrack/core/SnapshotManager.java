@@ -73,6 +73,7 @@ public class SnapshotManager {
     }
 
     private static void storeNewSnapshot(String jsonObject, Snapshot snapshot) throws IOException {
+        deleteOldestFileIfOverLimit(Paths.get("data", snapshot.getID()), settings.getSetting(Settings.SNAPSHOT_LIMIT));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILEDATEFORMAT);
         int index = jsonObject.lastIndexOf("}");
@@ -92,6 +93,28 @@ public class SnapshotManager {
             Path nf = fs.getPath(createSnapshotFilename(snapshot));
             Files.write(nf, extendedJsonObject.toString().getBytes());
         }
+    }
+
+    private static void deleteOldestFileIfOverLimit(Path directory, int limit) throws IOException {
+        Path oldestFile = null;
+
+        Stream<Path> stream = Files.list(directory);
+        if(stream.count() < limit){
+            stream.close();
+            return;
+        }
+        stream.close();
+
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
+            for (Path file : directoryStream) {
+                if (oldestFile == null || Files.getLastModifiedTime(file).compareTo(Files.getLastModifiedTime(oldestFile)) < 0) {
+                    oldestFile = file;
+                }
+            }
+        }
+
+        assert oldestFile != null;
+        Files.delete(oldestFile);
     }
 
     private static String createSnapshotFilename(Snapshot snapshot){
