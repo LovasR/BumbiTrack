@@ -28,6 +28,10 @@ public class SnapshotManager {
 
     private static String currentSnapshotDirectoryName;
 
+    private static boolean initialOldFileDeleted = false;
+
+    private static final Object fileDeletionLock = new Object();
+
     public static void initSnapshotManager(){
         settings = new Settings();
 
@@ -115,6 +119,10 @@ public class SnapshotManager {
 
         assert oldestFile != null;
         Files.delete(oldestFile);
+        initialOldFileDeleted = true;
+        synchronized(fileDeletionLock) {
+            fileDeletionLock.notifyAll();
+        }
     }
 
     private static String createSnapshotFilename(Snapshot snapshot){
@@ -122,9 +130,19 @@ public class SnapshotManager {
         return snapshot.getID() + "@" + snapshot.getDateTime().format(formatter) + ".json";
     }
 
-    private static void loadSnapshots(){
+    private static void loadSnapshots() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILEDATEFORMAT);
         Path oldDirectoryPath = Paths.get("data", currentSnapshotDirectoryName);
+        synchronized(fileDeletionLock) {
+            while (!initialOldFileDeleted) {
+                try {
+                    fileDeletionLock.wait();
+                } catch (InterruptedException e) {
+                    Main.log.warning("Waiting @loadSnapshots interrupted" + e.getLocalizedMessage());
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
         try(Stream<Path> filesStream = Files.walk(oldDirectoryPath)) {
             filesStream
                     .filter(Files::isRegularFile)
