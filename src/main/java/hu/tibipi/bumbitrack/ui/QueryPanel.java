@@ -120,7 +120,7 @@ public class QueryPanel extends JPanel {
     private JButton createAddBt(EmptyBorder internalBorder) {
         JButton queryLineAddBt = new JButton("Add");
         queryLineAddBt.addActionListener(t -> {
-            QueryLineItem<?> queryLineItem = new QueryLineItem<>(this, getChosenType());
+            QueryLineItem<?> queryLineItem = new QueryLineItem<>(this::removeQueryLine, getChosenType());
             queryLineItem.setBorder(new LineBorder(Color.DARK_GRAY, 2));
             queryLinesP.add(queryLineItem);
             getChosenQueryLines().add(queryLineItem);
@@ -133,11 +133,13 @@ public class QueryPanel extends JPanel {
         return queryLineAddBt;
     }
 
-    public void removeQueryLine(QueryLineItem queryLineItem){
+    public Void removeQueryLine(QueryLineItem queryLineItem){
         getChosenQueryLines().remove(queryLineItem);
         queryLinesP.remove(queryLineItem);
         this.revalidate();
         this.repaint();
+
+        return null;
     }
 
     void setQueryRunner(Function<QueryManager, Object> stationQuery, Function<QueryManager, Object> bikeQuery){

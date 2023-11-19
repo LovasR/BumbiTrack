@@ -18,7 +18,7 @@ public class QueryLineItem<T> extends JPanel {
     private final String[] bikeOptions =
             {"contains"};
 
-    public QueryLineItem(QueryPanel queryPanel, Class<T> queriedType) {
+    public QueryLineItem(Function<QueryLineItem, Void> removeFunction, Class<T> queriedType) {
         this.queriedType = queriedType;
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setMaximumSize(new Dimension(800, 55));
@@ -35,7 +35,7 @@ public class QueryLineItem<T> extends JPanel {
 
         JButton deleteBt = new JButton("Delete");
 
-        deleteBt.addActionListener(t -> queryPanel.removeQueryLine(this));
+        deleteBt.addActionListener(t -> removeFunction.apply(this));
 
         this.add(valueCb);
         this.add(comparatorCb);
