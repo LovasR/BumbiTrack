@@ -8,8 +8,8 @@ public class MainWindow extends JFrame {
 
     private final QueryPanel queryPanel;
     private final RoutePanel routePanel;
-    private JPanel statisticsPanel;
-    private JPanel settingsPanel;
+    private final StatisticsPanel statisticsPanel;
+    private final JPanel settingsPanel;
 
     MainWindow(){
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -18,7 +18,7 @@ public class MainWindow extends JFrame {
 
         queryPanel = new QueryPanel();
         routePanel = new RoutePanel();
-        statisticsPanel = new JPanel();
+        statisticsPanel = new StatisticsPanel();
         settingsPanel = new JPanel();
 
         mainPane = new JTabbedPane();
@@ -40,5 +40,9 @@ public class MainWindow extends JFrame {
 
     RoutePanel getRoutePanel(){
         return routePanel;
+    }
+
+    StatisticsPanel getStatisticsPanel(){
+        return statisticsPanel;
     }
 }

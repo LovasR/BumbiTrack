@@ -19,4 +19,10 @@ public interface AppUI {
     void setQueryResults(List<Station> results);
 
     void setRouteResults(Route resultRoute);
+
+    void setStatisticsQueryRunner(Function<QueryManager, Void> statisticsQuery);
+
+    String getChosenStatisticsGetter();
+
+    void setStatisticsData(List<Integer> data);
 }

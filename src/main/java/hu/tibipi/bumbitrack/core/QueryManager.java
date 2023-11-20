@@ -70,6 +70,36 @@ public class QueryManager {
         return null;
     }
 
+    Void statisticsQuery(AppUI appUI){
+        Query<Station> query = new Query<>();
+        List<Filter<Station>> filters = appUI.createFiltersFromQueryLines();
+        query.setFilters(filters);
+
+        //only integer attributes for now, booleans later
+        Function<Station, ?> getterFunction = Main.getStationGetterFunction(appUI.getChosenStatisticsGetter());
+
+        int firstIndex = SnapshotManager.getSnapshots().size() - appUI.getRouteLimit();
+        List<Snapshot> snapshots =
+                SnapshotManager.getSnapshots()
+                        .subList(Math.max(firstIndex, 0), SnapshotManager.getSnapshots().size());
+
+        List<Integer> dataPoints = new ArrayList<>();
+        for(Snapshot snap : snapshots) {
+            List<Station> result = query.executeForStations(snap.getCity().getStations());
+
+            int localSum = 0;
+            for(Station station : result){
+                localSum += (int) getterFunction.apply(station);
+            }
+
+            dataPoints.add(localSum);
+        }
+
+        appUI.setStatisticsData(dataPoints);
+
+        return null;
+    }
+
     static class TooManyQueryResultsException extends RuntimeException{
 
     }

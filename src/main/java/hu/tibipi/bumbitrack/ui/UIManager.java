@@ -26,7 +26,18 @@ public class UIManager implements AppUI {
     @Override
     public <T> List<Filter<T>> createFiltersFromQueryLines(){
         ArrayList<Filter<T>> filters = new ArrayList<>();
-        for(QueryLineItem<T> queryLineItem : mainWindow.getQueryPanel().getChosenQueryLines()){
+        List<QueryLineItem> queryLineItems;
+        switch (mainWindow.getMainPane().getSelectedIndex()){
+            case 0:
+                queryLineItems = mainWindow.getQueryPanel().getChosenQueryLines();
+                break;
+            case 2:
+                queryLineItems = mainWindow.getStatisticsPanel().getQueryLines();
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+        for(QueryLineItem<T> queryLineItem : queryLineItems){
             filters.add(queryLineItem.toFilter());
         }
         return filters;
@@ -55,5 +66,20 @@ public class UIManager implements AppUI {
     @Override
     public void setRouteResults(Route resultRoute){
         mainWindow.getRoutePanel().setResultsToTreeView(resultRoute);
+    }
+
+    @Override
+    public void setStatisticsQueryRunner(Function<QueryManager, Void> statisticsQuery) {
+        mainWindow.getStatisticsPanel().setQueryRunner(statisticsQuery);
+    }
+
+    @Override
+    public String getChosenStatisticsGetter() {
+        return mainWindow.getStatisticsPanel().getChosenGetter();
+    }
+
+    @Override
+    public void setStatisticsData(List<Integer> data) {
+        mainWindow.getStatisticsPanel().setDataToGraph(data);
     }
 }

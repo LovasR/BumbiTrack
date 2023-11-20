@@ -105,6 +105,10 @@ public class SnapshotManager {
         Stream<Path> stream = Files.list(directory);
         if(stream.count() < limit){
             stream.close();
+            initialOldFileDeleted = true;
+            synchronized(fileDeletionLock) {
+                fileDeletionLock.notifyAll();
+            }
             return;
         }
         stream.close();

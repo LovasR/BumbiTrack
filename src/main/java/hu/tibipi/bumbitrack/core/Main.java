@@ -23,15 +23,13 @@ public class Main {
 
         SnapshotManager.initSnapshotManager();
 
-        Thread initialSnapshotGet = new Thread(SnapshotManager::createNewSnapshot);
-        initialSnapshotGet.start();
-
         initGetterFunctionMaps();
 
         AppUI appUI = new UIManager();
         appUI.start();
         appUI.setQueryRunners(t -> qm.testStationUIGeneratedQuery(appUI), t -> qm.testBikeUIGeneratedQuery(appUI));
         appUI.setRouteQueryRunner(t -> qm.routeQuery(appUI));
+        appUI.setStatisticsQueryRunner(t -> qm.statisticsQuery(appUI));
     }
 
 
