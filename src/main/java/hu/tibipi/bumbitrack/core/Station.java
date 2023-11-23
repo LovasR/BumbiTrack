@@ -1,22 +1,36 @@
 package hu.tibipi.bumbitrack.core;
 
+import com.dslplatform.json.CompiledJson;
+import com.dslplatform.json.JsonAttribute;
+import com.dslplatform.json.JsonValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@CompiledJson
 public class Station {
-    private final Place place;
+    @JsonValue
+    public final double lat;
+    @JsonValue
+    public final double lng;
+    @JsonAttribute (name = "bike")
     private final boolean isBike;
+    @JsonAttribute (name = "number")
     private final int numberID;
+    @JsonValue
     private final String name;
+    @JsonAttribute (name = "bike_racks")
     private final int bikeCapacity;
+    @JsonAttribute (name = "bikes_available_to_rent")
     private final int bikesAvailable;
-    private ArrayList<Bike> bikes;
+    @JsonAttribute (name = "bike_list")
+    public List<Bike> bikes;
 
     Station(JSONObject json){
-        place = new Place(json.getFloat("lng"), json.getFloat("lat"));
+        lat = 0;
+        lng = 0;
         isBike = json.getBoolean("bike");
         numberID = json.getInt("number");
         name = json.getString("name");
@@ -31,11 +45,23 @@ public class Station {
         }
     }
 
+    Station(String name, boolean isBike, int numberID, int bikeCapacity, int bikesAvailable, double lat, double lng, List<Bike> bikes){
+        this.name = name;
+        this.isBike = isBike;
+        this.numberID = numberID;
+        this.bikeCapacity = bikeCapacity;
+        this.bikesAvailable = bikesAvailable;
+        this.lat = lat;
+        this.lng = lng;
+        this.bikes = bikes;
+    }
+
     //creates a virtual station that shouldn't be used
     Station(String name){
         this.name = name;
 
-        place = null;
+        lat = 0;
+        lng = 0;
         isBike = false;
         numberID = -1;
         bikeCapacity = -1;
@@ -45,7 +71,8 @@ public class Station {
 
     Station(Station stationToCopy){
         this.name = stationToCopy.name;
-        this.place = stationToCopy.place;
+        this.lat = stationToCopy.lat;
+        this.lng = stationToCopy.lng;
         this.bikesAvailable = stationToCopy.bikesAvailable;
         this.numberID = stationToCopy.numberID;
         this.isBike = stationToCopy.isBike;
@@ -55,7 +82,7 @@ public class Station {
     }
 
     public Place getPlace() {
-        return place;
+        return new Place(lng, lat);
     }
 
     public boolean isBike() {

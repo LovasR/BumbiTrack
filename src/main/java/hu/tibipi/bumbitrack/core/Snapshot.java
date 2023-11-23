@@ -1,23 +1,31 @@
 package hu.tibipi.bumbitrack.core;
 
+import com.dslplatform.json.CompiledJson;
+import com.dslplatform.json.JsonAttribute;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
+@CompiledJson
 public class Snapshot {
+    @JsonAttribute (name = "snapshot_time", nullable = false)
     private final LocalDateTime dateTime;
-    private final City city;
-
+    @JsonAttribute (name = "countries")
+    public final List<Country> countries;
+    @JsonAttribute (ignore = true)
     private final String ID;
 
 
-    Snapshot(City city, String countryName){
+    Snapshot(List<Country> countries){
         dateTime = LocalDateTime.now();
-        this.city = city;
-        this.ID = createID(countryName, city.getName());
+        this.countries = countries;
+        this.ID = createID(countries.get(0).getCountryName(), countries.get(0).getCity().getName());
     }
-    Snapshot(City city, String countryName, LocalDateTime dateTime){
+
+    Snapshot(List<Country> countries, LocalDateTime dateTime){
         this.dateTime = dateTime;
-        this.city = city;
-        this.ID = createID(countryName, city.getName());
+        this.countries = countries;
+        this.ID = createID(countries.get(0).getCountryName(), countries.get(0).getCity().getName());
     }
 
     public static String createID(String countryName, String cityName){
@@ -32,7 +40,7 @@ public class Snapshot {
     }
 
     public City getCity() {
-        return city;
+        return countries.get(0).getCity();
     }
 
     public String getID(){

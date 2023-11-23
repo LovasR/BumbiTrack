@@ -1,7 +1,6 @@
 package hu.tibipi.bumbitrack.core;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.dslplatform.json.DslJson;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +31,8 @@ public class SnapshotManager {
 
     private static final Object fileDeletionLock = new Object();
 
+    private static final String FILE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     public static void initSnapshotManager(){
         settings = new Settings();
 
@@ -55,37 +56,37 @@ public class SnapshotManager {
             return;
         }
 
-        JSONObject rootJSON = new JSONObject(jsonString);
+        byte[] jsonBytes = augmentJsonString(jsonString);
 
         try{
-            City bp = new City(rootJSON,
-                    settings.getSetting(Settings.COUNTRY_NAME),
-                    settings.getSetting(Settings.CITY_NAME));
-            Snapshot snapshot = new Snapshot(bp, settings.getSetting(Settings.COUNTRY_NAME));
+            DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
+            Snapshot snapshot = dslJson.deserialize(Snapshot.class, jsonBytes, jsonBytes.length);
+
             snapshots.add(snapshot);
             Main.currentSnap = snapshot;
             Main.log.info("New snapshot created");
 
-            storeNewSnapshot(jsonString, snapshot);
-        } catch (CountryNotFoundException e){
-            Main.log.log(Level.SEVERE, "Specified country not found in file");
-        } catch (CityNotFoundException e){
-            Main.log.log(Level.SEVERE, "Specified city not found in file");
+            storeNewSnapshot(jsonBytes, snapshot);
         } catch (IOException e){
             Main.log.severe("Couldn't store snapshot: " + e.getLocalizedMessage());
         }
     }
 
-    private static void storeNewSnapshot(String jsonObject, Snapshot snapshot) throws IOException {
+    private static byte[] augmentJsonString(String jsonIn){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_DATE_FORMAT);
+        int index = jsonIn.lastIndexOf("}");
+        StringBuilder extendedJsonObject = new StringBuilder(jsonIn);
+        extendedJsonObject.setCharAt(index, ' ');
+        extendedJsonObject.append(", \"snapshot_time\": \"").append(LocalDateTime.now().format(formatter)).append("\" }");
+
+        return extendedJsonObject.toString().getBytes();
+    }
+
+    private static void storeNewSnapshot(byte[] jsonObject, Snapshot snapshot) throws IOException {
         deleteOldestFileIfOverLimit(Paths.get("data", snapshot.getID()), settings.getSetting(Settings.SNAPSHOT_LIMIT));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILEDATEFORMAT);
-        int index = jsonObject.lastIndexOf("}");
-        StringBuilder extendedJsonObject = new StringBuilder(jsonObject);
-        extendedJsonObject.setCharAt(index, ' ');
-        extendedJsonObject.append(", \"snapshot_time\": \"").append(snapshot.getDateTime().format(formatter)).append("\" }");
-
-        Files.writeString(Paths.get("data", snapshot.getID(), createSnapshotFilename(snapshot)), extendedJsonObject.toString());
+        Files.write(Paths.get("data", snapshot.getID(), createSnapshotFilename(snapshot)), jsonObject);
 
         String zipFilePath = snapshot.getID() + ".zip";
 
@@ -95,7 +96,7 @@ public class SnapshotManager {
         Path path = Paths.get("data", zipFilePath);
         try (FileSystem fs = FileSystems.newFileSystem(path, env)) {
             Path nf = fs.getPath(createSnapshotFilename(snapshot));
-            Files.write(nf, extendedJsonObject.toString().getBytes());
+            Files.write(nf, jsonObject);
         }
     }
 
@@ -130,12 +131,11 @@ public class SnapshotManager {
     }
 
     private static String createSnapshotFilename(Snapshot snapshot){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILEDATEFORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_DATE_FORMAT);
         return snapshot.getID() + "@" + snapshot.getDateTime().format(formatter) + ".json";
     }
 
     private static void loadSnapshots() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILEDATEFORMAT);
         Path oldDirectoryPath = Paths.get("data", currentSnapshotDirectoryName);
         synchronized(fileDeletionLock) {
             while (!initialOldFileDeleted) {
@@ -152,18 +152,13 @@ public class SnapshotManager {
                     .filter(Files::isRegularFile)
                     .forEach(file -> {
                         try {
-                            JSONObject snapshotJson = new JSONObject(Files.readString(file));
+                            DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
+                            Snapshot snapshot = dslJson.deserialize(Snapshot.class, Files.newInputStream(file));
 
-                            City city = new City(snapshotJson,
-                                    settings.getSetting(Settings.COUNTRY_NAME),
-                                    settings.getSetting(Settings.CITY_NAME));
-
-                            Snapshot snapshot = new Snapshot(city,
-                                    settings.getSetting(Settings.COUNTRY_NAME),
-                                    LocalDateTime.parse(snapshotJson.getString("snapshot_time"), formatter));
+                            assert snapshot != null;
                             snapshots.add(snapshot);
                             Main.currentSnap = snapshot;
-                        } catch (IOException | JSONException | CityNotFoundException | CountryNotFoundException e) {
+                        } catch (IOException e) {
                             Main.log.severe("Couldn't load snapshot (" + file.getFileName() + "): " + e.getLocalizedMessage());
                             throw new SnapshotLoadException();
                         }
@@ -255,8 +250,6 @@ public class SnapshotManager {
             }
         }
     }
-
-    private static final String FILEDATEFORMAT = "yyyy-MM-dd_HH:mm:ss";
 
     private static class EnvironmentSetupException extends RuntimeException{}
     private static class SnapshotLoadException extends RuntimeException{}
