@@ -32,6 +32,7 @@ public class SnapshotManager {
     private static final Object fileDeletionLock = new Object();
 
     private static final String FILE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final DslJson<Snapshot> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
 
     public static void initSnapshotManager(){
         settings = new Settings();
@@ -59,7 +60,6 @@ public class SnapshotManager {
         byte[] jsonBytes = augmentJsonString(jsonString);
 
         try{
-            DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
             Snapshot snapshot = dslJson.deserialize(Snapshot.class, jsonBytes, jsonBytes.length);
 
             snapshots.add(snapshot);
@@ -147,28 +147,36 @@ public class SnapshotManager {
                 }
             }
         }
+        long startTime = System.nanoTime();
         try(Stream<Path> filesStream = Files.walk(oldDirectoryPath)) {
-            filesStream
+            List<Path> regularFiles = filesStream
                     .filter(Files::isRegularFile)
-                    .forEach(file -> {
-                        try {
-                            DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
-                            Snapshot snapshot = dslJson.deserialize(Snapshot.class, Files.newInputStream(file));
+                    .toList();
 
-                            assert snapshot != null;
-                            snapshots.add(snapshot);
-                            Main.currentSnap = snapshot;
-                        } catch (IOException e) {
-                            Main.log.severe("Couldn't load snapshot (" + file.getFileName() + "): " + e.getLocalizedMessage());
-                            throw new SnapshotLoadException();
-                        }
-                    });
+            regularFiles.parallelStream().forEach(file -> {
+                try {
+                    DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
+                    Snapshot snapshot = dslJson.deserialize(Snapshot.class, Files.newInputStream(file));
+
+                    assert snapshot != null;
+                    snapshots.add(snapshot);
+                } catch (IOException e) {
+                    Main.log.severe("Couldn't load snapshot (" + file.getFileName() + "): " + e.getLocalizedMessage());
+                    throw new SnapshotLoadException();
+                }
+            });
         } catch (IOException e){
             Main.log.severe("Couldn't load snapshots: " + e.getLocalizedMessage());
             throw new SnapshotLoadException();
         }
         snapshots.sort(Comparator.comparing(Snapshot::getDateTime));
-        Main.log.info("Snapshots loaded");
+        Main.currentSnap = snapshots.get(snapshots.size() - 1);
+
+        long endTime = System.nanoTime();
+        long executionTimeInNano = endTime - startTime;
+        double executionTimeInMilliseconds = (double) executionTimeInNano / 1_000_000;
+
+        Main.log.info(() -> "Snapshots loaded in: " + Math.round(executionTimeInMilliseconds) + " ms");
     }
 
     private static void setupEnvironment() {
