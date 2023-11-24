@@ -37,7 +37,7 @@ public class RoutePanel extends JPanel {
         bikeChooseTf.setBorder(internalBorder);
         JLabel resultLimitLb = new JLabel("Set limit: ");
         resultLimitLb.setBorder(internalBorder);
-        resultLimitTf = new JTextField("100", 5);
+        resultLimitTf = new JTextField("1000", 5);
         resultLimitTf.setBorder(internalBorder);
         bikeChooseP.add(bikeChooseLb);
         bikeChooseP.add(bikeChooseTf);

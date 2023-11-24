@@ -22,6 +22,7 @@ public class StatisticsPanel extends JPanel {
     private final JPanel queryLinesP;
 
     private final JComboBox<String> getterCb;
+    private final JTextField limitTf;
     private static final String[] getterOptions = {"Available bikes", "Bike capacity", "Bikes"};
 
     private final JButton runQueryBt;
@@ -34,11 +35,6 @@ public class StatisticsPanel extends JPanel {
 
         queryLineItems = new ArrayList<>();
 
-        JLabel testLb = new JLabel("Test");
-        testLb.setBorder(internalBorder);
-        testLb.setAlignmentX(Component.LEFT_ALIGNMENT);
-        this.add(testLb);
-
         queryLinesP = new JPanel();
         queryLinesP.setLayout(new BoxLayout(queryLinesP, BoxLayout.Y_AXIS));
         queryLinesP.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -48,28 +44,44 @@ public class StatisticsPanel extends JPanel {
         this.add(createAddBt(internalBorder));
         this.add(Box.createVerticalStrut(16));
 
-        JLabel getterLb = new JLabel("Set which attribute to aggregate:");
+        JPanel statisticsGridP = new JPanel();
+        statisticsGridP.setLayout(new GridLayout(2, 2));
+        JLabel getterLb = new JLabel("Set attribute to aggregate:");
         getterLb.setBorder(internalBorder);
+        getterLb.setAlignmentX(Component.LEFT_ALIGNMENT);
         getterCb = new JComboBox<>(getterOptions);
-        getterCb.setMaximumSize(new Dimension(800, 10));
+        getterCb.setMaximumSize(new Dimension(getterCb.getWidth(), 10));
         getterCb.setAlignmentX(Component.LEFT_ALIGNMENT);
         getterCb.setBorder(internalBorder);
-        this.add(getterLb);
-        this.add(getterCb);
+        statisticsGridP.add(getterLb);
+        statisticsGridP.add(getterCb);
+        JLabel limitLb = new JLabel("Set limit:");
+        limitLb.setBorder(internalBorder);
+        limitLb.setAlignmentX(Component.LEFT_ALIGNMENT);
+        limitTf = new JTextField("1000", 5);
+        limitTf.setBorder(internalBorder);
+        limitTf.setSize(new Dimension(400, 10));
+        statisticsGridP.add(limitLb);
+        statisticsGridP.add(limitTf);
+        statisticsGridP.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statisticsGridP.setMaximumSize(new Dimension(1000, 100));
+        this.add(statisticsGridP);
+        this.add(Box.createVerticalStrut(24));
 
         runQueryBt = new JButton("Run");
         runQueryBt.setBorder(internalBorder);
         runQueryBt.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(runQueryBt);
+        this.add(Box.createVerticalStrut(16));
 
-        lineGraphPanel = new LineGraphPanel(testLb.getForeground());
+        lineGraphPanel = new LineGraphPanel(getterLb.getForeground());
         lineGraphPanel.setBorder(internalBorder);
         lineGraphPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(lineGraphPanel);
     }
 
     private JButton createAddBt(EmptyBorder internalBorder) {
-        JButton queryLineAddBt = new JButton("Add");
+        JButton queryLineAddBt = new JButton("Add filter");
         queryLineAddBt.addActionListener(t -> {
             QueryLineItem<?> queryLineItem = new QueryLineItem<>(this::removeQueryLine, Station.class);
             queryLineItem.setBorder(new LineBorder(Color.DARK_GRAY, 2));
@@ -111,6 +123,15 @@ public class StatisticsPanel extends JPanel {
                 return "getBikesNumber";
             default:
                 throw new IllegalStateException();
+        }
+    }
+
+    int getStatisticsLimit(){
+        try {
+            return Integer.parseInt(limitTf.getText());
+        } catch (NumberFormatException e){
+            Main.log.warning("Non number in textfield, defaulting to 1000");
+            return 1000;
         }
     }
 

@@ -78,7 +78,7 @@ public class QueryManager {
         //only integer attributes for now, booleans later
         Function<Station, ?> getterFunction = Main.getStationGetterFunction(appUI.getChosenStatisticsGetter());
 
-        int firstIndex = SnapshotManager.getSnapshots().size() - appUI.getRouteLimit();
+        int firstIndex = SnapshotManager.getSnapshots().size() - appUI.getStatisticsLimit();
         List<Snapshot> snapshots =
                 SnapshotManager.getSnapshots()
                         .subList(Math.max(firstIndex, 0), SnapshotManager.getSnapshots().size());

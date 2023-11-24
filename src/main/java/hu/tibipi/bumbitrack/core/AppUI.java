@@ -28,5 +28,7 @@ public interface AppUI {
 
     String getChosenStatisticsGetter();
 
+    int getStatisticsLimit();
+
     void setStatisticsData(List<Integer> data);
 }

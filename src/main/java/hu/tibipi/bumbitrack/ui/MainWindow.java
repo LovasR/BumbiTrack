@@ -56,11 +56,12 @@ public class MainWindow extends JFrame {
         loadingP.setLayout(new BoxLayout(loadingP, BoxLayout.Y_AXIS));
         loadingP.setBorder(new EmptyBorder(10, 20, 10, 20));
 
-        JLabel loadingLb = new JLabel("Loading . . .");
+        JLabel loadingLb = new JLabel("Loading...");
         loadingLb.setAlignmentX(Component.CENTER_ALIGNMENT);
         loadingLb.setAlignmentY(Component.CENTER_ALIGNMENT);
         loadingP.add(Box.createVerticalGlue()); // Add space above the label
         loadingP.add(loadingLb);
+        loadingP.add(Box.createVerticalStrut(10));
 
         loadingPb = new JProgressBar();
         loadingPb.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -89,6 +89,11 @@ public class UIManager implements AppUI {
     }
 
     @Override
+    public int getStatisticsLimit() {
+        return mainWindow.getStatisticsPanel().getStatisticsLimit();
+    }
+
+    @Override
     public void setStatisticsData(List<Integer> data) {
         mainWindow.getStatisticsPanel().setDataToGraph(data);
     }
