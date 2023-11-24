@@ -14,6 +14,16 @@ public class UIManager implements AppUI {
     }
 
     @Override
+    public void deleteLoadingScreen(){
+        mainWindow.deleteLoadingScreen();
+    }
+
+    @Override
+    public void updateLoadingStatus(int progress) {
+        mainWindow.updateLoadingStatus(progress);
+    }
+
+    @Override
     public void start() {
         mainWindow.setVisible(true);
     }

@@ -15,6 +15,9 @@ public class Main {
     public static final Logger log = Logger.getLogger(Main.class.getName());
     static Snapshot currentSnap = null;
     public static final QueryManager qm = new QueryManager();
+    private static AppUI appUI;
+    private static final boolean isAppUILoaded = false;
+    private static final Object appUILoadedLock = new Object();
     private static Map<String, Function<Station, ?>> stationGetterFunctionMap;
     private static Map<String, Function<Bike, ?>> bikeGetterFunctionMap;
     public static void main(String[] args){
@@ -23,16 +26,22 @@ public class Main {
 
         SnapshotManager.initSnapshotManager();
 
-        initGetterFunctionMaps();
-
-        AppUI appUI = new UIManager();
+        appUI = new UIManager();
         appUI.start();
         appUI.setQueryRunners(t -> qm.testStationUIGeneratedQuery(appUI), t -> qm.testBikeUIGeneratedQuery(appUI));
         appUI.setRouteQueryRunner(t -> qm.routeQuery(appUI));
         appUI.setStatisticsQueryRunner(t -> qm.statisticsQuery(appUI));
+
+        initGetterFunctionMaps();
     }
 
+    public static void snapshotsLoaded(){
+        appUI.deleteLoadingScreen();
+    }
 
+    public static void updateSnapshotLoadingProgress(long progress){
+        appUI.updateLoadingStatus((int) progress);
+    }
 
     private static void initGetterFunctionMaps(){
         stationGetterFunctionMap = new HashMap<>();

@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -29,6 +30,8 @@ public class SnapshotManager {
 
     private static boolean initialOldFileDeleted = false;
 
+    private static final AtomicLong snapshotsProcessed = new AtomicLong(0);
+
     private static final Object fileDeletionLock = new Object();
 
     private static final String FILE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -39,7 +42,7 @@ public class SnapshotManager {
 
         int updateFrequency = settings.getSetting(Settings.UPDATE_FREQUENCY);
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(SnapshotManager::createNewSnapshot, 0, updateFrequency, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(SnapshotManager::createNewSnapshot, 1, updateFrequency, TimeUnit.SECONDS);
 
         setupEnvironment();
 
@@ -147,6 +150,10 @@ public class SnapshotManager {
                 }
             }
         }
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(SnapshotManager::snapshotLoadProgressMonitor, 0, 100, TimeUnit.MILLISECONDS);
+
         long startTime = System.nanoTime();
         try(Stream<Path> filesStream = Files.walk(oldDirectoryPath)) {
             List<Path> regularFiles = filesStream
@@ -160,6 +167,8 @@ public class SnapshotManager {
 
                     assert snapshot != null;
                     snapshots.add(snapshot);
+
+                    snapshotsProcessed.incrementAndGet();
                 } catch (IOException e) {
                     Main.log.severe("Couldn't load snapshot (" + file.getFileName() + "): " + e.getLocalizedMessage());
                     throw new SnapshotLoadException();
@@ -177,6 +186,12 @@ public class SnapshotManager {
         double executionTimeInMilliseconds = (double) executionTimeInNano / 1_000_000;
 
         Main.log.info(() -> "Snapshots loaded in: " + Math.round(executionTimeInMilliseconds) + " ms");
+
+        Main.snapshotsLoaded();     //show UI
+    }
+
+    private static void snapshotLoadProgressMonitor(){
+        Main.updateSnapshotLoadingProgress(snapshotsProcessed.get());
     }
 
     private static void setupEnvironment() {
