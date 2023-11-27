@@ -3,25 +3,39 @@ package hu.tibipi.bumbitrack.core;
 import com.dslplatform.json.CompiledJson;
 import com.dslplatform.json.JsonAttribute;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@CompiledJson
 public class Country {
-    @JsonAttribute (name = "cities")
-    public final List<City> city;
-    @JsonAttribute (name = "name")
+    private final List<City> cities;
     private final String countryName;
 
-    Country(List<City> city, String countryName){
-        this.city = city;
-        this.countryName = countryName;
+    Country(CountryDTO dataTransferObject){
+        cities = new ArrayList<>();
+        for(CityDTO cityDTO : dataTransferObject.cities){
+            cities.add(new City(cityDTO));
+        }
+        this.countryName = dataTransferObject.countryName;
     }
 
     public City getCity() {
-        return city.get(0);
+        return cities.get(0);
     }
 
     public String getCountryName() {
         return countryName;
+    }
+
+    @CompiledJson
+    static class CountryDTO {
+        @JsonAttribute(name = "cities")
+        public final List<CityDTO> cities;
+        @JsonAttribute(name = "name")
+        public final String countryName;
+
+        CountryDTO(List<CityDTO> cities, String countryName) {
+            this.cities = cities;
+            this.countryName = countryName;
+        }
     }
 }

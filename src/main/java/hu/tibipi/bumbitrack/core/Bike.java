@@ -2,23 +2,20 @@ package hu.tibipi.bumbitrack.core;
 
 import com.dslplatform.json.CompiledJson;
 import com.dslplatform.json.JsonValue;
-import org.json.JSONObject;
 
 @CompiledJson
 public class Bike {
-    @JsonValue
-    private final int number;
-    @JsonValue
-    private final boolean isActive;
+    private final int number; // The number associated with the bike
+    private final boolean isActive; // The active status of the bike
 
-    Bike(JSONObject json){
-        number = json.getInt("number");
-        isActive = json.getBoolean("active");
-    }
-
-    Bike(int number, boolean isActive){
-        this.number = number;
-        this.isActive = isActive;
+    /**
+     * Constructs a Bike object with a number and active status.
+     *
+     *
+     */
+    public Bike(BikeDTO dto) {
+        this.number = dto.number;
+        this.isActive = dto.isActive;
     }
 
     public int getNumber() {

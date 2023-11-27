@@ -35,12 +35,12 @@ public class SnapshotManager {
     private static final Object fileDeletionLock = new Object();
 
     private static final String FILE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final DslJson<Snapshot> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
+    private static final DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
 
     public static void initSnapshotManager(){
-        settings = new Settings();
+        settings = Settings.initSettingsDirectory(dslJson);
 
-        int updateFrequency = settings.getSetting(Settings.UPDATE_FREQUENCY);
+        int updateFrequency = settings.getUpdateCycle();
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(SnapshotManager::createNewSnapshot, 1, updateFrequency, TimeUnit.SECONDS);
 
@@ -53,9 +53,9 @@ public class SnapshotManager {
     public static void createNewSnapshot() {
         String jsonString;
         try {
-            jsonString = NetUtils.downloadJsonFromURL(settings.getSetting(Settings.URL));
+            jsonString = NetUtils.downloadJsonFromURL(settings.getUsedUrl());
         } catch (IOException e) {
-            Main.log.log(Level.SEVERE, "Couldnt load .json from web");
+            Main.log.severe("Couldn't load .json from web " + e.getLocalizedMessage());
             Main.currentSnap = null;
             return;
         }
@@ -63,7 +63,8 @@ public class SnapshotManager {
         byte[] jsonBytes = augmentJsonString(jsonString);
 
         try{
-            Snapshot snapshot = dslJson.deserialize(Snapshot.class, jsonBytes, jsonBytes.length);
+            Snapshot snapshot = new Snapshot(
+                    Objects.requireNonNull(dslJson.deserialize(Snapshot.SnapshotDTO.class, jsonBytes, jsonBytes.length)));
 
             snapshots.add(snapshot);
             Main.currentSnap = snapshot;
@@ -87,7 +88,7 @@ public class SnapshotManager {
     }
 
     private static void storeNewSnapshot(byte[] jsonObject, Snapshot snapshot) throws IOException {
-        deleteOldestFileIfOverLimit(Paths.get("data", snapshot.getID()), settings.getSetting(Settings.SNAPSHOT_LIMIT));
+        deleteOldestFileIfOverLimit(Paths.get("data", snapshot.getID()), settings.getSnapshotLimit());
 
         Files.write(Paths.get("data", snapshot.getID(), createSnapshotFilename(snapshot)), jsonObject);
 
@@ -163,9 +164,10 @@ public class SnapshotManager {
             regularFiles.parallelStream().forEach(file -> {
                 try {
                     DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
-                    Snapshot snapshot = dslJson.deserialize(Snapshot.class, Files.newInputStream(file));
+                    Snapshot snapshot = new Snapshot(
+                            Objects.requireNonNull(
+                                    dslJson.deserialize(Snapshot.SnapshotDTO.class, Files.newInputStream(file))));
 
-                    assert snapshot != null;
                     snapshots.add(snapshot);
 
                     snapshotsProcessed.incrementAndGet();
@@ -195,7 +197,7 @@ public class SnapshotManager {
     }
 
     private static void setupEnvironment() {
-        currentSnapshotDirectoryName = Snapshot.createID(settings.getSetting(Settings.COUNTRY_NAME), settings.getSetting(Settings.CITY_NAME));
+        currentSnapshotDirectoryName = Snapshot.createID(settings.getCountryName(), settings.getCityName());
 
         File dataDirectory = new File(Paths.get("data").toUri());
         File oldDirectory = null;
