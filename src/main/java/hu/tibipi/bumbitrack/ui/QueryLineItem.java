@@ -73,6 +73,7 @@ public class QueryLineItem<T> extends JPanel {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Filter<T> toFilterInternal(Class<T> classType, String label, String comparedValue, String comparatorLabel){
 
         if(classType == Station.class) {
@@ -98,7 +99,10 @@ public class QueryLineItem<T> extends JPanel {
                             stringToPredicate(comparatorLabel)
                     );
                 case "distance":
-                    break;
+                    return (Filter<T>) new DistanceFilter(
+                            SnapshotManager.getSnapshots().get(SnapshotManager.getSnapshots().size() - 1).getCity().getPlace(),
+                            permissiveIntParse(comparedValue)
+                    );
                 case "is_bike":
                     Function<Station, Boolean> getterFunction5 = Main.getStationGetterFunction("isBike");
                     return (Filter<T>) new GeneralFilter<>(
@@ -132,18 +136,13 @@ public class QueryLineItem<T> extends JPanel {
     }
 
     private <C> BiPredicate<C, C> stringToPredicate(String label){
-        switch(label){
-            case "==":
-                return Object::equals;
-            case "<=":
-                return (c1, c2) -> ((Comparable<C>) c1).compareTo(c2) <= 0;
-            case ">=":
-                return (c1, c2) -> ((Comparable<C>) c1).compareTo(c2) >= 0;
-            case "not":
-                return (c1, c2) -> !c1.equals(c2);
-            default:
-                throw new IllegalArgumentException("Comparator selection error");
-        }
+        return switch (label) {
+            case "==" -> Object::equals;
+            case "<=" -> (c1, c2) -> ((Comparable<C>) c1).compareTo(c2) <= 0;
+            case ">=" -> (c1, c2) -> ((Comparable<C>) c1).compareTo(c2) >= 0;
+            case "not" -> (c1, c2) -> !c1.equals(c2);
+            default -> throw new IllegalArgumentException("Comparator selection error");
+        };
     }
 
 

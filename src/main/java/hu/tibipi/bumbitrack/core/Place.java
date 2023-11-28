@@ -8,13 +8,13 @@ public class Place {
         latitude = la;
     }
 
-    double degreesToRadian(double deg){
+    static double degreesToRadian(double deg){
         return deg * 3.14159 / 180;
     }
 
-    double calcDistance(Place p1, Place p2){
-        double latdiff = degreesToRadian(p1.latitude - p2.latitude);
-        double lngdiff = degreesToRadian(p1.longitude - p2.longitude);
+    double calcDistanceTo(Place p){
+        double latdiff = degreesToRadian(latitude - p.latitude);
+        double lngdiff = degreesToRadian(longitude - p.longitude);
 
         double radius = 6371;        //estimation of earth's radius
 
@@ -22,7 +22,7 @@ public class Place {
         double b = Math.sin(lngdiff / 2);
 
         return 2 * radius * Math.asin(
-                Math.sqrt((a * a + Math.cos(degreesToRadian(p1.latitude)) * Math.cos(degreesToRadian(p2.latitude)) * b * b))
+                Math.sqrt((a * a + Math.cos(degreesToRadian(latitude)) * Math.cos(degreesToRadian(p.latitude)) * b * b))
             );
     }
 }
