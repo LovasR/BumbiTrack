@@ -7,14 +7,12 @@
 - [Description](#description)
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
 - [Documentation](#documentation)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Description
 
-This program processes the information of any [Nextbike](nextbike.net) system, [MOL Bubi](molbubi.hu) by default.
+This program processes the information of any [Nextbike](https://nextbike.net) system, [MOL Bubi](https://molbubi.hu) by default.
 
 ## Features
 
