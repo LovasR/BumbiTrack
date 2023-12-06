@@ -6,17 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * Represents a Route composed of RouteItems such as RouteStops and RouteGaps.
+ */
 public class Route {
-    List<RouteItem> stops;
 
+    private final List<RouteItem> stops; // List of stops in the route
+
+    /**
+     * Constructs a Route based on the given list of stations and corresponding times.
+     *
+     * @param stationList The list of stations on the route
+     * @param times       The list of times corresponding to each station
+     */
     Route(List<Station> stationList, List<LocalDateTime> times){
         stops = new ArrayList<>();
-
         stationsToRoute(stationList, times);
     }
 
-    private void stationsToRoute(List<Station> stationList, List<LocalDateTime> times){
-        if(stationList.isEmpty())
+    /**
+     * Converts the list of stations and times into RouteItems (RouteStops and RouteGaps).
+     *
+     * @param stationList The list of stations on the route
+     * @param times       The list of times corresponding to each station
+     */
+    private void stationsToRoute(List<Station> stationList, List<LocalDateTime> times) {
+        if (stationList.isEmpty())
             return;
 
         Station lastStation = stationList.get(0);
@@ -33,7 +48,7 @@ public class Route {
                 lastEqualStation = station;
             }
 
-            //check for gap in data
+            // Check for gap in data
             Duration duration = Duration.between(
                     times.get(stationList.indexOf(lastStation)),
                     times.get(stationList.indexOf(station)));
@@ -45,16 +60,35 @@ public class Route {
         }
     }
 
+    /**
+     * Retrieves the list of RouteItems representing stops and gaps in the route.
+     *
+     * @return The list of RouteItems in the route
+     */
     public List<RouteItem> getStops() {
         return stops;
     }
 
+    /**
+     * Represents an item in the Route.
+     */
     public interface RouteItem{}
+
+    /**
+     * Represents a stop in the Route.
+     */
     public static class RouteStop implements RouteItem {
         private final LocalDateTime start;
         private final LocalDateTime end;
         private final Station station;
 
+        /**
+         * Constructs a RouteStop with start and end times and the corresponding station.
+         *
+         * @param start   The start time of the stop
+         * @param end     The end time of the stop
+         * @param station The station associated with the stop
+         */
         RouteStop(LocalDateTime start, LocalDateTime end, Station station){
             this.start = start;
             this.end = end;
@@ -74,9 +108,17 @@ public class Route {
         }
     }
 
+    /**
+     * Represents a gap in the Route where data is not available for a specific duration.
+     */
     public static class RouteGap implements RouteItem {
         private final Duration duration;
 
+        /**
+         * Constructs a RouteGap with a specific duration.
+         *
+         * @param duration The duration representing the gap
+         */
         RouteGap(Duration duration){
             this.duration = duration;
         }

@@ -1,9 +1,6 @@
 package hu.tibipi.bumbitrack.ui;
 
-import hu.tibipi.bumbitrack.core.Bike;
-import hu.tibipi.bumbitrack.core.Main;
-import hu.tibipi.bumbitrack.core.QueryManager;
-import hu.tibipi.bumbitrack.core.Station;
+import hu.tibipi.bumbitrack.core.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A panel that runs {@link Filter}s on the most recent available {@link Snapshot}
+ */
 public class QueryPanel extends JPanel {
     JButton runQueryBt;
 

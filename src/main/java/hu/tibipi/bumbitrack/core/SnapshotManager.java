@@ -13,30 +13,25 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 
+/**
+ * Manages the creation and storage of snapshots based on configuration settings.
+ */
 public class SnapshotManager {
-
-    SnapshotManager(){}
-
-    private static final List<Snapshot> snapshots = new ArrayList<>();
-    public static List<Snapshot> getSnapshots() {
-        return snapshots;
-    }
+    private static List<Snapshot> snapshots = new ArrayList<>();
     private static Settings settings;
-
     private static String currentSnapshotDirectoryName;
-
     private static boolean initialOldFileDeleted = false;
-
     private static final AtomicLong snapshotsProcessed = new AtomicLong(0);
-
     private static final Object fileDeletionLock = new Object();
-
     private static final String FILE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final DslJson<Object> dslJson = new DslJson<>(com.dslplatform.json.runtime.Settings.basicSetup());
 
+    /**
+     * Initializes the SnapshotManager by setting up settings, scheduling snapshot creation,
+     * and loading snapshots from files.
+     */
     public static void initSnapshotManager(){
         settings = Settings.initSettingsDirectory(dslJson);
 
@@ -50,6 +45,10 @@ public class SnapshotManager {
         loadThread.start();
     }
 
+
+    /**
+     * Creates a new snapshot based on the data retrieved from a URL and stores it.
+     */
     public static void createNewSnapshot() {
         String jsonString;
         try {
@@ -76,6 +75,12 @@ public class SnapshotManager {
         }
     }
 
+    /**
+     * Augments the JSON string by appending a snapshot_time field with the current date and time.
+     *
+     * @param jsonIn The JSON string to be extended.
+     * @return A byte array representing the extended JSON string.
+     */
     private static byte[] augmentJsonString(String jsonIn){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_DATE_FORMAT);
@@ -87,6 +92,13 @@ public class SnapshotManager {
         return extendedJsonObject.toString().getBytes();
     }
 
+    /**
+     * Stores a new snapshot in the data directory and creates a zip file for the snapshot.
+     *
+     * @param jsonObject The JSON data to be stored.
+     * @param snapshot   The snapshot object containing information about the snapshot.
+     * @throws IOException if an I/O error occurs while storing the snapshot.
+     */
     private static void storeNewSnapshot(byte[] jsonObject, Snapshot snapshot) throws IOException {
         deleteOldestFileIfOverLimit(Paths.get("data", snapshot.getID()), settings.getSnapshotLimit());
 
@@ -104,6 +116,13 @@ public class SnapshotManager {
         }
     }
 
+    /**
+     * Deletes the oldest file in a directory if the file count exceeds the specified limit.
+     *
+     * @param directory The directory where files are stored.
+     * @param limit     The maximum number of files allowed in the directory.
+     * @throws IOException if an I/O error occurs while deleting the oldest file.
+     */
     private static void deleteOldestFileIfOverLimit(Path directory, int limit) throws IOException {
         Path oldestFile = null;
 
@@ -134,11 +153,21 @@ public class SnapshotManager {
         }
     }
 
+    /**
+     * Creates a filename for a snapshot based on the snapshot's ID and date/time.
+     *
+     * @param snapshot The snapshot object for which the filename is created.
+     * @return The filename for the snapshot.
+     */
     private static String createSnapshotFilename(Snapshot snapshot){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_DATE_FORMAT);
         return snapshot.getID() + "@" + snapshot.getDateTime().format(formatter) + ".json";
     }
 
+    /**
+     * Loads snapshots from the old directory path, deserializes them, and adds them to the snapshot list.
+     * Starts the thread that monitors the progress of loading snapshots and updates the loading progress in the application.
+     */
     private static void loadSnapshots() {
         Path oldDirectoryPath = Paths.get("data", currentSnapshotDirectoryName);
         synchronized(fileDeletionLock) {
@@ -192,10 +221,18 @@ public class SnapshotManager {
         Main.snapshotsLoaded();     //show UI
     }
 
+    /**
+     * Monitors the progress of loading snapshots and updates the loading progress in the application.
+     */
     private static void snapshotLoadProgressMonitor(){
         Main.updateSnapshotLoadingProgress(snapshotsProcessed.get());
     }
 
+    /**
+     * Sets up the environment for managing snapshots.
+     * Checks the existence of a snapshot directory, deletes the old directory contents if needed,
+     * creates a new snapshot directory, and unzips snapshots to the directory.
+     */
     private static void setupEnvironment() {
         currentSnapshotDirectoryName = Snapshot.createID(settings.getCountryName(), settings.getCityName());
 
@@ -238,6 +275,11 @@ public class SnapshotManager {
                 Paths.get("data", currentSnapshotDirectoryName + ".zip").toString());
     }
 
+    /**
+     * Creates a new snapshot directory with the specified directory name.
+     *
+     * @param directoryName Name of the directory to be created
+     */
     private static void createNewSnapshotDirectory(String directoryName){
         File snapshotDirectory = new File(Paths.get("data", directoryName).toUri());
 
@@ -246,6 +288,12 @@ public class SnapshotManager {
         }
     }
 
+    /**
+     * Unzips snapshots from the specified zip file path to the given directory.
+     *
+     * @param directoryName Name of the directory where snapshots are to be unzipped
+     * @param zipFilePath   Path to the ZIP file containing snapshots
+     */
     private static void unzipSnapshotsToDirectory(String directoryName, String zipFilePath){
         int numThreads = 4;
         try (FileSystem fs = FileSystems.newFileSystem(Paths.get(directoryName, zipFilePath), (Map<String, ?>) null)) {
@@ -263,6 +311,9 @@ public class SnapshotManager {
         }
     }
 
+    /**
+     * A worker class that implements the Runnable interface to extract files from a ZIP archive.
+     */
     private record FileExtractor(Path zipEntryPath, FileSystem fileSystem) implements Runnable {
         @Override
         public void run() {
@@ -276,6 +327,30 @@ public class SnapshotManager {
         }
     }
 
-    private static class EnvironmentSetupException extends RuntimeException{}
-    private static class SnapshotLoadException extends RuntimeException{}
+    /**
+     * Sets the snapshots list, only if SnapshotManager is called from a JUnit test.
+     */
+    public static void setSnapshots(List<Snapshot> newSnapshots){
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            if (element.getClassName().startsWith("org.junit")) {
+                snapshots = new ArrayList<>(newSnapshots);
+                break;
+            }
+        }
+        // Not called from a JUnit context
+    }
+
+    public static List<Snapshot> getSnapshots() {
+        return snapshots;
+    }
+
+    /**
+     * Exception thrown when encountering issues during the setup of the environment for snapshots.
+     */
+    private static class EnvironmentSetupException extends RuntimeException { }
+
+    /**
+     * Exception thrown when encountering issues while loading snapshots.
+     */
+    private static class SnapshotLoadException extends RuntimeException { }
 }

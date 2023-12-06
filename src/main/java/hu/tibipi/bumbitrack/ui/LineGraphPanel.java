@@ -8,10 +8,17 @@ import java.util.List;
 
 
 /**
- * @author Rodrigo, Maritaria
- * <a href="https://gist.github.com/roooodcastro/6325153?permalink_comment_id=3107524#gistcomment-3107524">src</a>
+ * Represents a custom JPanel to render a line graph.
+ * This class is a modified version based on an original implementation.
  *
- * this is a modified version of the original
+ * Original source: <a href="https://gist.github.com/roooodcastro/6325153?permalink_comment_id=3107524#gistcomment-3107524">
+ *     https://gist.github.com/roooodcastro/6325153?permalink_comment_id=3107524#gistcomment-3107524</a>
+ *
+ * This JPanel displays a line graph with customizable features such as padding, color, stroke, divisions, etc.
+ * It renders a line graph based on a list of values provided to the graph.
+ * Each instance of LineGraphPanel represents a single line graph.
+ *
+ * @author Rodrigo, Maritaria
  */
 public class LineGraphPanel extends JPanel {
     private static final int PADDING = 25;
@@ -26,6 +33,11 @@ public class LineGraphPanel extends JPanel {
 
     private final Color labelColor;
 
+    /**
+     * Constructs a LineGraphPanel instance with a specified label color.
+     *
+     * @param labelColor The color used for graph labels.
+     */
     public LineGraphPanel(Color labelColor) {
         setPreferredSize(new Dimension(PADDING * 2 + 300, PADDING * 2 + 200));
         this.labelColor = labelColor;
@@ -41,6 +53,12 @@ public class LineGraphPanel extends JPanel {
         updateUI();
     }
 
+    /**
+     * Overrides the paintComponent method to render the graphical representation of the LineGraphPanel.
+     * It performs the painting of the graph object within this JPanel.
+     *
+     * @param graphics The Graphics object used to paint the component.
+     */
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -120,6 +138,18 @@ public class LineGraphPanel extends JPanel {
         }
     }
 
+    /**
+     * Creates vertical markings along the y-axis of the graph panel to indicate score divisions.
+     * Renders grid lines and labels for the y-axis divisions.
+     *
+     * @param width        The width of the graph panel.
+     * @param height       The height of the graph panel.
+     * @param minScore     The minimum score value in the dataset.
+     * @param scoreRange   The range of scores in the dataset.
+     * @param fontMetrics  The FontMetrics object used for text measurement.
+     * @param fontHeight   The height of the font used for labels.
+     * @param g            The Graphics2D object used for rendering.
+     */
     private void createVerticalMarkings(int width, int height, double minScore, double scoreRange, FontMetrics fontMetrics, float fontHeight, Graphics2D g){
         for (int i = 0; i < NUMBER_Y_DIVISIONS + 1; i++) {
             final int x1 = PADDING + LABEL_PADDING;
@@ -138,6 +168,16 @@ public class LineGraphPanel extends JPanel {
         }
     }
 
+    /**
+     * Creates horizontal markings along the x-axis of the graph panel to indicate data points.
+     * Renders grid lines and labels for the x-axis divisions.
+     *
+     * @param width        The width of the graph panel.
+     * @param height       The height of the graph panel.
+     * @param fontMetrics  The FontMetrics object used for text measurement.
+     * @param fontHeight   The height of the font used for labels.
+     * @param g            The Graphics2D object used for rendering.
+     */
     private void createHorizontalMarkings(int width, int height, FontMetrics fontMetrics, float fontHeight, Graphics2D g){
         int length = values.size();
         if (length > 1) {
@@ -158,10 +198,20 @@ public class LineGraphPanel extends JPanel {
         }
     }
 
+    /**
+     * Retrieves the minimum value from the list of scores.
+     *
+     * @return The minimum score from the list of values. If the list is empty, returns 0.
+     */
     private double getMinScore() {
         return values.stream().min(Integer::compareTo).orElse(0);
     }
 
+    /**
+     * Retrieves the maximum value from the list of scores.
+     *
+     * @return The maximum score from the list of values. If the list is empty, returns 0.
+     */
     private double getMaxScore() {
         return values.stream().max(Integer::compareTo).orElse(0);
     }

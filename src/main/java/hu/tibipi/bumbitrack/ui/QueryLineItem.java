@@ -7,6 +7,10 @@ import java.awt.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+/**
+ * A representation of a {@link Filter} in UI.
+ * @param <T> template parameter to Filter
+ */
 public class QueryLineItem<T> extends JPanel {
     private final Class<T> queriedType;
     private final JComboBox<String> valueCb;
@@ -18,6 +22,12 @@ public class QueryLineItem<T> extends JPanel {
     private final String[] bikeOptions =
             {"contains"};
 
+    /**
+     * Constructor to QueryLineItem.
+     *
+     * @param removeFunction the remove function to parent to call on remove.
+     * @param queriedType type of {@link Filter} this line represents.
+     */
     public QueryLineItem(Function<QueryLineItem, Void> removeFunction, Class<T> queriedType) {
         this.queriedType = queriedType;
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -43,8 +53,13 @@ public class QueryLineItem<T> extends JPanel {
         this.add(deleteBt);
     }
 
+    /**
+     * Converts the current state of the filter configuration into a {@link Filter} object.
+     * This method acts as a handle to improve code readability.
+     *
+     * @return A {@link Filter} object configured based on the current settings.
+     */
     public Filter<T> toFilter(){
-        //this is only a handle to improve readability
         return toFilterInternal(
                 queriedType,
                 (String) valueCb.getSelectedItem(),
@@ -53,6 +68,12 @@ public class QueryLineItem<T> extends JPanel {
         );
     }
 
+    /**
+     * Fault-tolerant string to int.
+     *
+     * @param string String to be parsed.
+     * @return the string parsed or 0 on error.
+     */
     private int permissiveIntParse(String string){
         try {
             return Integer.parseInt(string);
@@ -61,6 +82,12 @@ public class QueryLineItem<T> extends JPanel {
         }
     }
 
+    /**
+     * Fault-tolerant string to boolean.
+     *
+     * @param string String to be parsed.
+     * @return the string parsed or 0 on error.
+     */
     private boolean booleanParse(String string){
         string = string.toLowerCase();
         switch (string){
@@ -73,6 +100,15 @@ public class QueryLineItem<T> extends JPanel {
         }
     }
 
+    /**
+     * The internal part of toFilter. Creates a filter based on the label specified, along with other elements from GUI.
+     *
+     * @param classType type of filter to create.
+     * @param label label that specifies the getter to use.
+     * @param comparedValue string representation of the value to compare to.
+     * @param comparatorLabel string representation of the comparator to use.
+     * @return returns a filter in the specified class.
+     */
     @SuppressWarnings("unchecked")
     private Filter<T> toFilterInternal(Class<T> classType, String label, String comparedValue, String comparatorLabel){
 
@@ -135,6 +171,14 @@ public class QueryLineItem<T> extends JPanel {
         return null;
     }
 
+    /**
+     * Converts a string comparator to a BiPredicate.
+     *
+     * @param label a string of the comparator.
+     * @return a BiPredicate naturally associated with the string.
+     * @param <C> the type to compare.
+     */
+    @SuppressWarnings("unchecked")
     private <C> BiPredicate<C, C> stringToPredicate(String label){
         return switch (label) {
             case "==" -> Object::equals;

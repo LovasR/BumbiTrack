@@ -27,6 +27,11 @@ public class StatisticsPanel extends JPanel {
 
     private final JButton runQueryBt;
 
+    /**
+     * Constructs a StatisticsPanel object, initializing the GUI components for displaying statistics.
+     * The panel includes components for defining query lines, setting attribute aggregation options,
+     * specifying limits, running queries, and displaying the resulting line graph.
+     */
     StatisticsPanel(){
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -80,6 +85,12 @@ public class StatisticsPanel extends JPanel {
         this.add(lineGraphPanel);
     }
 
+    /**
+     * Creates and configures a JButton to add a new query line item when clicked.
+     *
+     * @param internalBorder An EmptyBorder object defining internal padding for the button.
+     * @return The configured JButton for adding a new query line item.
+     */
     private JButton createAddBt(EmptyBorder internalBorder) {
         JButton queryLineAddBt = new JButton("Add filter");
         queryLineAddBt.addActionListener(t -> {
@@ -96,10 +107,21 @@ public class StatisticsPanel extends JPanel {
         return queryLineAddBt;
     }
 
+    /**
+     * Sets the ActionListener for the 'Run' button to execute the statistics query.
+     *
+     * @param statisticsQuery A Function taking a QueryManager and returning Void, representing the statistics query.
+     */
     public void setQueryRunner(Function<QueryManager, Void> statisticsQuery){
         runQueryBt.addActionListener(t -> statisticsQuery.apply(Main.qm));
     }
 
+    /**
+     * Removes the specified query line item from the panel.
+     *
+     * @param queryLineItem The QueryLineItem object to be removed.
+     * @return Always returns null after removing the query line item.
+     */
     public Void removeQueryLine(QueryLineItem queryLineItem){
         getQueryLines().remove(queryLineItem);
         queryLinesP.remove(queryLineItem);
@@ -109,10 +131,21 @@ public class StatisticsPanel extends JPanel {
         return null;
     }
 
+    /**
+     * Retrieves the list of query line items present in the StatisticsPanel.
+     *
+     * @return The list of QueryLineItem objects representing the query lines.
+     */
     public List<QueryLineItem> getQueryLines(){
         return queryLineItems;
     }
 
+    /**
+     * Gets the chosen getter method based on the selected item in the JComboBox.
+     *
+     * @return A String representing the chosen getter method for attribute aggregation.
+     * @throws IllegalStateException if an unexpected item is selected in the JComboBox.
+     */
     public String getChosenGetter(){
         switch ((String) Objects.requireNonNull(getterCb.getSelectedItem())){
             case "Available bikes":

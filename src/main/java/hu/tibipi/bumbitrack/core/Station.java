@@ -7,16 +7,25 @@ import com.dslplatform.json.JsonValue;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Station {
-    private final double lat;
-    private final double lng;
-    private final boolean isBike;
-    private final int numberID;
-    private final String name;
-    private final int bikeCapacity;
-    private final int bikesAvailable;
-    private List<Bike> bikes;
 
+/**
+ * Represents a station object with specific details.
+ */
+public class Station {
+    private final double lat; // Latitude coordinate of the station.
+    private final double lng; // Longitude coordinate of the station.
+    private final boolean isBike; // Indicates if the station is associated with bikes.
+    private final int numberID; // Unique number ID of the station.
+    private final String name; // Name of the station.
+    private final int bikeCapacity; // Capacity of bike racks at the station.
+    private final int bikesAvailable; // Number of bikes currently available at the station.
+    private List<Bike> bikes; // List of bikes available at the station.
+
+    /**
+     * Constructs a Station object from the StationDTO.
+     *
+     * @param dto StationDTO object to create a Station from.
+     */
     public Station(StationDTO dto){
         this.name = dto.name;
         this.isBike = dto.isBike;
@@ -57,34 +66,67 @@ public class Station {
         this.bikes = new ArrayList<>(stationToCopy.bikes);
     }
 
+    /**
+     * Retrieves the location of the station as a Place object.
+     *
+     * @return Place object representing the station's location.
+     */
     public Place getPlace() {
         return new Place(lng, lat);
     }
-
+    /**
+     * Checks if the station is associated with bikes.
+     * @return True if the station is related to bikes, otherwise false.
+     */
     public boolean isBike() {
         return isBike;
     }
 
+    /**
+     * Retrieves the unique number ID of the station.
+     * @return The number ID of the station.
+     */
     public int getNumberID() {
         return numberID;
     }
 
+    /**
+     * Retrieves the name of the station.
+     * @return The name of the station.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Retrieves the capacity of bike racks at the station.
+     * @return The capacity of bike racks at the station.
+     */
     public int getBikeCapacity() {
         return bikeCapacity;
     }
 
+    /**
+     * Retrieves the number of bikes currently available at the station.
+     * @return The number of bikes available at the station.
+     */
     public int getBikesAvailable() {
         return bikesAvailable;
     }
 
+    /**
+     * Retrieves the list of bikes available at the station.
+     * @return A new list containing the bikes available at the station.
+     */
     public List<Bike> getBikes() {
         return new ArrayList<>(bikes);
     }
 
+    /**
+     * Retrieves the number of bikes available at the station.
+     *
+     * @return The number of bikes available.
+     */
     public int getBikesNumber() {
         return bikes.size();
     }
@@ -93,6 +135,9 @@ public class Station {
         bikes = new ArrayList<>(nBikes);
     }
 
+    /**
+     * DTO class representing Station data.
+     */
     @CompiledJson
     public static class StationDTO {
         @JsonValue
