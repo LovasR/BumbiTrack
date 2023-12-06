@@ -1,7 +1,5 @@
 # Bumbi Track
 
-[Include a brief and catchy project description or tagline here.]
-
 ## Table of Contents
 
 - [Description](#description)
